@@ -2,7 +2,7 @@
 
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
-import { YUP } from '../constants/constants';
+import { YUP } from '../../constants/constants';
 
 interface Values {
   location: string;

@@ -11,7 +11,6 @@ interface Values {
 interface GenericValues<T> {
   formikConfig: FormikConfig<T>;
 }
-let SinglePageForm: React.FC<GenericValues>;
 export default SinglePageForm = ({ formikConfig }) => {
   const formik = useFormik<FormikValues>(formikConfig);
 

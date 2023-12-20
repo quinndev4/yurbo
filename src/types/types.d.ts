@@ -1,6 +1,11 @@
-declare type OkRes = {
-  ok: string;
-};
+import { NextRequest, NextResponse } from 'next/server';
+
+interface GenericResponse {
+  success: boolean;
+  message: string;
+}
+
+declare interface GenericError extends Error, GenericResponse {}
 
 declare interface GenericFormFieldComponent<T> extends T {
   id: string;
@@ -17,6 +22,18 @@ declare interface GenericFormField<T> {
 declare interface GenericFormProps<> {
   fields: GenericFormField[];
   onSubmit: FormEventHandler<HTMLFormElement>;
+}
+
+declare interface CreateEventRequest extends NextRequest {
+  body: { eventName: string };
+}
+
+declare interface CreateEventResponse extends GenericResponse {
+  eventName: string;
+}
+
+declare interface CreateEventError extends GenericError {
+  eventName: string;
 }
 
 /*

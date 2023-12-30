@@ -2,6 +2,9 @@ export const ERRORS = {
   EVENT: {
     CREATED: 'Event failed to create',
   },
+  YURBO: {
+    CREATED: 'Yurbo failed to create',
+  },
   UNATHORIZED: 'User not authorized',
   UNKNOWN: 'An unknown error occurred',
 };

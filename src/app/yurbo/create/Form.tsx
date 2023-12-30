@@ -3,32 +3,41 @@
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
 import { YUP } from '../../constants/constants';
+import { CreateYurboResponse } from '@/types/types';
+import { getErrorMessgaeSuccess } from '@/app/constants/errors';
 
 interface Values {
   location: string;
 }
 
+const name = 'location';
+const label = 'Location';
+
 export default function Form() {
   const onSubmit = async (formikValues: Values) => {
-    alert(JSON.stringify(formikValues, null, 2));
+    try {
+      const res = await fetch('/api/yurbo/create', {
+        method: 'POST',
+        body: JSON.stringify(formikValues),
+      });
+      const data: CreateYurboResponse = await res.json();
 
-    /*
-     console.log('submitted');
-
-          const res = await fetch('/api/submit', {
-            method: 'POST',
-            body: JSON.stringify({ location }),
-          });
-          const data: OkRes = await res.json();
-
-          console.log(data.ok);
-    */
+      alert(JSON.stringify(data, null, 2));
+    } catch (error) {
+      alert(
+        JSON.stringify(
+          { ...formikValues, ...getErrorMessgaeSuccess(error) },
+          null,
+          2
+        )
+      );
+    }
   };
 
   const formik = useFormik<Values>({
-    initialValues: { location: '' },
+    initialValues: { [name]: '' },
     validationSchema: Yup.object().shape({
-      location: Yup.string()
+      [name]: Yup.string()
         .min(3, 'Must be at least 3 characters')
         .required(YUP.REQUIRED),
     }),
@@ -39,20 +48,20 @@ export default function Form() {
     <div className='2xs:w-4/5 xl:w-1/2 bg-blue-600'>
       <form className='flex flex-col m-5' onSubmit={formik.handleSubmit}>
         <div className='flex flex-col w-full items-start my-5'>
-          <label htmlFor='location'>Location *</label>
+          <label htmlFor='location'>{label} *</label>
           <input
             className='text-black text-left w-1/4'
-            id='location'
+            id={name}
             type='text'
-            placeholder='Enter Location'
-            {...formik.getFieldProps('location')}
+            placeholder={`Enter ${label}`}
+            {...formik.getFieldProps(name)}
           />
           <p
             className={`text-red-600 h-5 ${
-              !formik.errors.location && 'invisible'
+              !formik.errors[name] && 'invisible'
             }`}
           >
-            {formik.errors.location}
+            {formik.errors[name]}
           </p>
         </div>
 

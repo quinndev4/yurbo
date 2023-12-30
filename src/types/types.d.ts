@@ -24,6 +24,7 @@ declare interface GenericFormProps<> {
   onSubmit: FormEventHandler<HTMLFormElement>;
 }
 
+/* Create Event Types  */
 declare interface CreateEventRequest extends NextRequest {
   body: { eventName: string };
 }
@@ -34,6 +35,19 @@ declare interface CreateEventResponse extends GenericResponse {
 
 declare interface CreateEventError extends GenericError {
   eventName: string;
+}
+
+/* Create Yurbo Types  */
+declare interface CreateYurboRequest extends NextRequest {
+  body: { location: string };
+}
+
+declare interface CreateYurboResponse extends GenericResponse {
+  location: string;
+}
+
+declare interface CreateYurboError extends GenericError {
+  location: string;
 }
 
 /*

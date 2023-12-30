@@ -22,8 +22,6 @@ export async function POST(request: CreateEventRequest) {
       );
     }
 
-    console.log('bro', eventName);
-
     const docRef = doc(collection(db, 'users', session.user.email, 'events'));
 
     // add new personal event

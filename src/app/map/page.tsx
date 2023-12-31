@@ -4,13 +4,14 @@ import { useEffect, useRef } from "react";
 import { Loader } from "@googlemaps/js-api-loader";
 
 // Ask developer David Ham for api keys
+// todo: search thru db for all posts by you,
+// Have a list of null at start, then in useEffect add to list w db query
 
 export default function Map() {
   const mapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const initMap = async () => {
-      //   console.log("map init");
       const loader = new Loader({
         apiKey: process.env.NEXT_PUBLIC_MAPS_API_KEY as string,
         version: "weekly",
@@ -45,5 +46,5 @@ export default function Map() {
     initMap();
   }, []);
 
-  return <div style={{ height: "600px" }} ref={mapRef}></div>;
+  return <div style={{ height: "700px" }} ref={mapRef}></div>;
 }

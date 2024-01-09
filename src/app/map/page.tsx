@@ -10,14 +10,14 @@ export default function Map() {
   }
 
   return (
-    <div className="flex">
+    <div className="flex h-screen">
       <div
         className="w-1/2 h-screen pt-16"
         // style={{ maxHeight: "calc(100vh - 64px", overflowX: "scroll" }}
       >
         Probably a list of your yurbos . . .
       </div>
-      <div className="inline-flex min-w-[600px]">
+      <div className="h-full w-1/2">
         <MapboxMap mapboxToken={mapbox_token} />
       </div>
     </div>

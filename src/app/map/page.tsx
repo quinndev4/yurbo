@@ -46,5 +46,9 @@ export default function Map() {
     initMap();
   }, []);
 
+<<<<<<< HEAD
   return <div style={{ height: "700px" }} ref={mapRef}></div>;
+=======
+  return <div style={{ height: "600px" }} ref={mapRef}></div>;
+>>>>>>> 51d87e00ffef75abc7540c28b5e80863da46a95b
 }

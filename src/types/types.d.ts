@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
 
 interface GenericResponse {
   success: boolean;
@@ -39,7 +39,7 @@ declare interface CreateEventError extends GenericError {
 
 /* Create Yurbo Types  */
 declare interface CreateYurboRequest extends NextRequest {
-  body: { location: string };
+  body: { location: string; lat: number; long: number };
 }
 
 declare interface CreateYurboResponse extends GenericResponse {

@@ -1,21 +1,38 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-// import mapboxgl, { Map } from "mapbox-gl";
-import ReactMapGL, { Marker } from "react-map-gl";
-import getCenter from "geolib/es/getCenter";
+import ReactMapGl, { Marker } from "react-map-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
 
 interface MapboxMapProps {
   mapboxToken: string;
 }
-export default function MapboxMap({ mapboxToken }: MapboxMapProps) {
-  // const mapContainer = useRef<HTMLDivElement>(null);
-  // let map: Map | null = null;
 
-  const [viewport, setViewport] = useState({
-    latitude: 37.7577,
-    longitude: -122.4376,
-    zoom: 9,
+// async function getYurbos() {
+//   // Authenticate
+//   const session = await getServerSession(authOptions);
+//   if (!session?.user?.email) {
+//     return Response.json(
+//       { success: false, mesage: ERRORS.UNATHORIZED },
+//       { status: 401 }
+//     );
+//   }
+
+//   // get yurbos for this user
+//   const [yurbos, loading, error] = useCollection(
+//     query(
+//       collection(db, "users", session.user.email, "yurbos"),
+//       orderBy("timestamp", "desc")
+//     )
+//   );
+// }
+
+export default function MapboxMap({ mapboxToken }: MapboxMapProps) {
+  const [initialViewport, setInitialViewport] = useState({
+    // dummy lat and long info before finding location
+    latitude: -999,
+    longitude: -999,
+    zoom: 11,
     width: "100%",
     height: "100%",
   });
@@ -25,36 +42,35 @@ export default function MapboxMap({ mapboxToken }: MapboxMapProps) {
     { latitude: 37.7749, longitude: -122.4194, name: "Marker 2" },
   ];
 
-  // useEffect(() => {
-  //   navigator.geolocation.getCurrentPosition(function (position) {
-  //     console.log("Latitude is :", position.coords.latitude);
-  //     console.log("Longitude is :", position.coords.longitude);
-  //     setViewport({
-  //       latitude: position.coords.latitude,
-  //       longitude: position.coords.longitude,
-  //       zoom: 9,
-  //       width: "100%",
-  //       height: "100%",
-  //     });
-  //   });
-  // });
+  useEffect(() => {
+    // works!
+    navigator.geolocation.getCurrentPosition((position) => {
+      setInitialViewport({
+        ...initialViewport,
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+        zoom: 11,
+        width: "100%",
+        height: "100%",
+      });
+    });
+  }, []);
 
   return (
-    <ReactMapGL
-      mapStyle="mapbox://styles/david-ham/clr6mfjmg010z01qu02xbhf0w"
-      mapboxAccessToken={mapboxToken}
-      {...viewport}
-      // onViewportChange={(newViewport) => setViewport(newViewport)}
-    >
-      {markers.map((marker) => (
-        <Marker
-          key={marker.latitude + marker.longitude}
-          latitude={marker.latitude}
-          longitude={marker.longitude}
-        >
-          <div className="bg-red-600">{marker.name}</div>
-        </Marker>
-      ))}
-    </ReactMapGL>
+    <>
+      {initialViewport.latitude != -999 &&
+        initialViewport.longitude != -999 && (
+          <ReactMapGl
+            mapStyle="mapbox://styles/david-ham/clr6mfjmg010z01qu02xbhf0w"
+            mapboxAccessToken={mapboxToken}
+            initialViewState={initialViewport}
+          >
+            <Marker
+              longitude={initialViewport.longitude}
+              latitude={initialViewport.latitude}
+            />
+          </ReactMapGl>
+        )}
+    </>
   );
 }

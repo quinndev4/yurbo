@@ -112,6 +112,7 @@ export default function Form() {
           </p>
         </div>
 
+        {/* Autofill current coordinates */}
         <button
           className="btn-primary m-auto mb-2"
           type="button"

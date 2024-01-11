@@ -3,29 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import ReactMapGl, { Marker } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+import { getErrorMessage } from "../constants/errors";
+import { Yurbo } from "@/types/types";
 
 interface MapboxMapProps {
   mapboxToken: string;
 }
-
-// async function getYurbos() {
-//   // Authenticate
-//   const session = await getServerSession(authOptions);
-//   if (!session?.user?.email) {
-//     return Response.json(
-//       { success: false, mesage: ERRORS.UNATHORIZED },
-//       { status: 401 }
-//     );
-//   }
-
-//   // get yurbos for this user
-//   const [yurbos, loading, error] = useCollection(
-//     query(
-//       collection(db, "users", session.user.email, "yurbos"),
-//       orderBy("timestamp", "desc")
-//     )
-//   );
-// }
 
 export default function MapboxMap({ mapboxToken }: MapboxMapProps) {
   const [initialViewport, setInitialViewport] = useState({
@@ -42,8 +25,9 @@ export default function MapboxMap({ mapboxToken }: MapboxMapProps) {
     { latitude: 37.7749, longitude: -122.4194, name: "Marker 2" },
   ];
 
+  // const [yurbos, setYurbos] = useState<Yurbo[]>([]);
+
   useEffect(() => {
-    // works!
     navigator.geolocation.getCurrentPosition((position) => {
       setInitialViewport({
         ...initialViewport,
@@ -54,6 +38,24 @@ export default function MapboxMap({ mapboxToken }: MapboxMapProps) {
         height: "100%",
       });
     });
+
+    // // get yurbos
+    // const getYurbos = async () => {
+    //   console.log("getting yurbos");
+    //   try {
+    //     const res = await fetch("/api/yurbo/get");
+    //     if (!res.ok) {
+    //       throw new Error("Failed to fetch data");
+    //     }
+    //     const result = await res.json();
+
+    //     setYurbos(result.yurbos);
+    //   } catch (e) {
+    //     const errorMessage = getErrorMessage(e);
+    //     console.log(errorMessage);
+    //   }
+    // };
+    // getYurbos();
   }, []);
 
   return (

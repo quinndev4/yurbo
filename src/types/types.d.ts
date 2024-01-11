@@ -1,3 +1,4 @@
+import { Timestamp } from "firebase/firestore";
 import { NextRequest, NextResponse } from "next/server";
 
 interface GenericResponse {
@@ -48,6 +49,23 @@ declare interface CreateYurboResponse extends GenericResponse {
 
 declare interface CreateYurboError extends GenericError {
   location: string;
+}
+
+/* Get Yurbo Types */
+declare interface GetYurbosResponse extends GenericResponse {
+  yurbos: Yurbo[];
+}
+
+declare interface GetYurbosError extends GenericError {
+  yurbos: Yurbo[];
+}
+
+/* Class for a Yurbo */
+declare interface Yurbo {
+  created_at?: Timestamp;
+  location?: string;
+  lat?: number;
+  long?: number;
 }
 
 /*

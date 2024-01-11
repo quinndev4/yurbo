@@ -1,28 +1,73 @@
 import { Yurbo } from "@/types/types";
 import MapboxMap from "../components/MapboxMap";
-import { getErrorMessage } from "../constants/errors";
+import { ERRORS, getErrorMessage } from "../constants/errors";
+
+import { db } from "../../firebase";
+import { useCollection } from "react-firebase-hooks/firestore";
+import {
+  doc,
+  setDoc,
+  serverTimestamp,
+  collection,
+  orderBy,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../api/auth/[...nextauth]/route";
+import { LOGS } from "@/app/constants/logs";
 
 // todo: make the mapboxmap component take in marker props (your yurbos), then display these marker props
 
-// works!
+// extrapolated logic from api...
 async function getYurbos() {
-  console.log("getting yurbos");
   try {
-    const res = await fetch("http://localhost:3000/api/yurbo/get");
+    const session = await getServerSession(authOptions);
 
-    const result: { yurbos: Yurbo[] } = await res.json();
+    // no user found in session
+    if (!session?.user?.email) {
+      return Response.json(
+        { success: false, mesage: ERRORS.UNATHORIZED },
+        { status: 401 }
+      );
+    }
 
-    return result.yurbos;
-  } catch (e) {
-    const errorMessage = getErrorMessage(e);
-    console.log(errorMessage);
+    // get yurbos for this user
+    const yurbo_snapshot = await getDocs(
+      query(
+        collection(db, "users", session.user.email, "yurbos")
+        // orderBy("timestamp", "desc")
+      )
+    );
+
+    let yurbos: Yurbo[] = [];
+
+    yurbo_snapshot.forEach((doc) => {
+      yurbos.push(doc.data());
+    });
+
+    console.log(LOGS.YURBO.GOT, "for user", session.user.email, yurbos);
+    return Response.json({ yurbos });
+  } catch (error) {
+    const errorMessage = getErrorMessage(error);
+
+    // failure
+    console.error(ERRORS.YURBO.GOT, JSON.stringify({ message: errorMessage }));
+    return Response.json(
+      { mesage: errorMessage, success: false },
+      { status: 500 }
+    );
   }
 }
 
 export default async function Map() {
   let mapbox_token = process.env.MAPBOX_PUBLIC_TOKEN;
 
-  const yurbos = await getYurbos();
+  const res = await getYurbos();
+  const data = await res.json(); // had to split these into two awaits
+  const yurbos = data.yurbos;
+
   console.log("Yurboooos", yurbos);
 
   //   make sure types are correct

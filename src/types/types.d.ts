@@ -62,10 +62,16 @@ declare interface GetYurbosError extends GenericError {
 
 /* Class for a Yurbo */
 declare interface Yurbo {
+  event?: Event;
   created_at?: Timestamp;
   location?: string;
   lat?: number;
   long?: number;
+}
+
+/* Class for Event */
+declare interface Event {
+  name: string;
 }
 
 /*

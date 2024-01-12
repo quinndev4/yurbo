@@ -63,7 +63,7 @@ declare interface GetYurbosError extends GenericError {
 /* Class for a Yurbo */
 declare interface Yurbo {
   act?: Act;
-  created_at?: Timestamp;
+  created_at: Timestamp;
   location: string;
   lat: number;
   long: number;

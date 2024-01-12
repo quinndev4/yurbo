@@ -13,6 +13,7 @@ import {
   query,
   where,
   getDocs,
+  Timestamp,
 } from "firebase/firestore";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route";
@@ -29,7 +30,6 @@ async function getYurbos() {
   try {
     const session = await getServerSession(authOptions);
 
-    // no user found in session
     if (!session?.user?.email) {
       return Response.json(
         { success: false, mesage: ERRORS.UNATHORIZED },
@@ -89,17 +89,28 @@ export default async function Map() {
 
   return (
     <div className="flex h-screen">
-      <div
-        className="w-1/2 h-screen pt-16 ml-5"
-        // style={{ maxHeight: "calc(100vh - 64px", overflowX: "scroll" }}
-      >
-        <h2 className="font-bold text-lg">Your Yurbos</h2>
+      {/* Left Screen: List of Yurbos */}
+      <div className="w-1/2 h-screen pt-16 ml-5">
+        <div className="flex flex-row justify-between mr-5">
+          <h2 className="font-bold text-lg">Your Yurbos</h2>
+          <h2>Created on</h2>
+        </div>
+
         <ul>
           {yurbos?.map((y: Yurbo) => (
-            <li>{y.location}</li>
+            <div className="flex flex-row justify-between">
+              <li key={"loc " + y.location}>{y.location}</li>
+              {/* {y.created_at instanceof Timestamp && (
+                <li key={"time " + y.created_at.toDate().toDateString()}>
+                  {y.created_at.toDate().toDateString()}
+                </li>
+              )} */}
+            </div>
           ))}
         </ul>
       </div>
+
+      {/* Right Screen: Map */}
       <div className="h-full w-1/2">
         <MapboxMap mapboxToken={mapbox_token} yurbos={yurbos} />
       </div>

@@ -51,7 +51,7 @@ async function getYurbos() {
     yurbo_snapshot.forEach((doc) => {
       const y = doc.data();
       // ensure data exists && is a Yurbo before pushing
-      if (y && isYurbo(y)) {
+      if (isYurbo(y)) {
         yurbos.push(y);
       } else {
         console.error("A datum does not conform to Yurbo interface:", y);

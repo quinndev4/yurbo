@@ -17,6 +17,12 @@ import { LOGS } from "@/app/constants/logs";
 import { Yurbo } from "@/types/types";
 
 export async function GET() {
+  function isYurbo(y: any): y is Yurbo {
+    return (
+      y && "lat" in y && "long" in y && "location" in y && "created_at" in y
+    );
+  }
+
   try {
     const session = await getServerSession(authOptions);
 
@@ -39,8 +45,12 @@ export async function GET() {
     let yurbos: Yurbo[] = [];
 
     yurbo_snapshot.forEach((doc) => {
-      //   console.log("datum: ", doc.data());
-      yurbos.push(doc.data());
+      const y = doc.data();
+      if (y && isYurbo(y)) {
+        yurbos.push(y);
+      } else {
+        console.error("datum is not assignable to a yurbo...", y);
+      }
     });
 
     // const yurbos = yurbo_snapshot.map((doc) => doc.data());

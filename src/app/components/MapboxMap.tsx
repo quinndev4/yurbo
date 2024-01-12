@@ -8,9 +8,10 @@ import { Yurbo } from "@/types/types";
 
 interface MapboxMapProps {
   mapboxToken: string;
+  yurbos: Yurbo[];
 }
 
-export default function MapboxMap({ mapboxToken }: MapboxMapProps) {
+export default function MapboxMap({ mapboxToken, yurbos }: MapboxMapProps) {
   const [initialViewport, setInitialViewport] = useState({
     // dummy lat and long info before finding location
     latitude: -999,
@@ -20,7 +21,13 @@ export default function MapboxMap({ mapboxToken }: MapboxMapProps) {
     height: "100%",
   });
 
-  const markers = [
+  const markers = yurbos.map((y) => ({
+    latitude: y.lat,
+    longitude: y.long,
+    name: y.location,
+  }));
+
+  const markers1 = [
     { latitude: 37.7577, longitude: -122.4376, name: "Marker 1" },
     { latitude: 37.7749, longitude: -122.4194, name: "Marker 2" },
   ];
@@ -38,24 +45,6 @@ export default function MapboxMap({ mapboxToken }: MapboxMapProps) {
         height: "100%",
       });
     });
-
-    // // get yurbos
-    // const getYurbos = async () => {
-    //   console.log("getting yurbos");
-    //   try {
-    //     const res = await fetch("/api/yurbo/get");
-    //     if (!res.ok) {
-    //       throw new Error("Failed to fetch data");
-    //     }
-    //     const result = await res.json();
-
-    //     setYurbos(result.yurbos);
-    //   } catch (e) {
-    //     const errorMessage = getErrorMessage(e);
-    //     console.log(errorMessage);
-    //   }
-    // };
-    // getYurbos();
   }, []);
 
   return (
@@ -67,10 +56,9 @@ export default function MapboxMap({ mapboxToken }: MapboxMapProps) {
             mapboxAccessToken={mapboxToken}
             initialViewState={initialViewport}
           >
-            <Marker
-              longitude={initialViewport.longitude}
-              latitude={initialViewport.latitude}
-            />
+            {markers.map((m) => (
+              <Marker longitude={m.longitude} latitude={m.latitude}></Marker>
+            ))}
           </ReactMapGl>
         )}
     </>

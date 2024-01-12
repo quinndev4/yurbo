@@ -18,10 +18,14 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 import { LOGS } from "@/app/constants/logs";
 
-// todo: make the mapboxmap component take in marker props (your yurbos), then display these marker props
-
-// extrapolated logic from api...
+// extrapolated logic from api... need to fix caching
 async function getYurbos() {
+  // Type guard function (know if this is right!)
+  function isYurbo(y: any): y is Yurbo {
+    return (
+      y && "lat" in y && "long" in y && "location" in y && "created_at" in y
+    );
+  }
   try {
     const session = await getServerSession(authOptions);
 
@@ -43,8 +47,15 @@ async function getYurbos() {
 
     let yurbos: Yurbo[] = [];
 
+    // populate yurbos array. Not sure whats the best way to do type stuff but i tried
     yurbo_snapshot.forEach((doc) => {
-      yurbos.push(doc.data());
+      const y = doc.data();
+      // ensure data exists && is a Yurbo before pushing
+      if (y && isYurbo(y)) {
+        yurbos.push(y);
+      } else {
+        console.error("A datum does not conform to Yurbo interface:", y);
+      }
     });
 
     console.log(LOGS.YURBO.GOT, "for user", session.user.email, yurbos);
@@ -79,9 +90,10 @@ export default async function Map() {
   return (
     <div className="flex h-screen">
       <div
-        className="w-1/2 h-screen pt-16"
+        className="w-1/2 h-screen pt-16 ml-5"
         // style={{ maxHeight: "calc(100vh - 64px", overflowX: "scroll" }}
       >
+        <h2 className="font-bold text-lg">Your Yurbos</h2>
         <ul>
           {yurbos?.map((y: Yurbo) => (
             <li>{y.location}</li>
@@ -89,7 +101,7 @@ export default async function Map() {
         </ul>
       </div>
       <div className="h-full w-1/2">
-        <MapboxMap mapboxToken={mapbox_token} />
+        <MapboxMap mapboxToken={mapbox_token} yurbos={yurbos} />
       </div>
     </div>
   );

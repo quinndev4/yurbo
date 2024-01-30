@@ -10,6 +10,12 @@ export default function HomePage() {
       <Link href={"/event/create"} className="rounded-lg border-2 border-white">
         Create a new Event
       </Link>
+      <Link
+        href={"/location/create"}
+        className="rounded-lg border-2 border-white"
+      >
+        Create a new Location
+      </Link>
       <Link href={"/map"} className="rounded-lg border-2 border-white">
         Your Yurbos
       </Link>

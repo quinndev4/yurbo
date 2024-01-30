@@ -90,28 +90,37 @@ export default async function Map() {
   return (
     <div className="flex h-screen">
       {/* Left Screen: List of Yurbos */}
-      <div className="w-1/2 h-screen pt-16 ml-5">
-        <div className="flex flex-row justify-between mr-5">
+      <div className="hidden sm:block md:w-1/2 md:h-screen md:pt-16 md:ml-5">
+        <div className="flex flex-row justify-between mr-5 border-b mb-2 pb-1">
           <h2 className="font-bold text-lg">Your Yurbos</h2>
-          <h2>Created on</h2>
+          <h2 className="font-bold">Coordinates</h2>
+          <h2 className="font-bold">Created on</h2>
         </div>
 
         <ul>
           {yurbos?.map((y: Yurbo) => (
-            <div className="flex flex-row justify-between">
-              <li key={"loc " + y.location}>{y.location}</li>
-              {/* {y.created_at instanceof Timestamp && (
-                <li key={"time " + y.created_at.toDate().toDateString()}>
-                  {y.created_at.toDate().toDateString()}
+            <div
+              key={y.lat.toString() + y.long.toString()}
+              className="flex flex-row justify-between"
+            >
+              <li key={"loc " + y.location} className="">
+                {y.location}
+              </li>
+              <li key={"coord " + y.lat} className="pr-2">
+                {y.lat} x {y.long}
+              </li>
+              {y.created_at && (
+                <li key={y.location} className="pr-4">
+                  {new Date(y.created_at.seconds * 1000).toLocaleDateString()}
                 </li>
-              )} */}
+              )}
             </div>
           ))}
         </ul>
       </div>
 
       {/* Right Screen: Map */}
-      <div className="h-full w-1/2">
+      <div className="h-full w-full md:w-1/2">
         <MapboxMap mapboxToken={mapbox_token} yurbos={yurbos} />
       </div>
     </div>

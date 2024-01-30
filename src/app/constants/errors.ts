@@ -6,6 +6,10 @@ export const ERRORS = {
     CREATED: "Yurbo failed to create",
     GOT: "Yurbos failed to be retrieved",
   },
+  LOCATION: {
+    CREATED: "Location failed to create",
+    GOT: "Locations failed to be retrieved",
+  },
   UNATHORIZED: "User not authorized",
   UNKNOWN: "An unknown error occurred",
 };

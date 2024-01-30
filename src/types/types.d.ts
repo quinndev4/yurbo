@@ -65,6 +65,7 @@ declare interface Yurbo {
   act?: Act;
   created_at: Timestamp;
   location: string;
+  name?: string;
   lat: number;
   long: number;
 }
@@ -73,6 +74,25 @@ declare interface Yurbo {
 declare interface Act {
   name: string;
   created_at: Timestamp;
+}
+
+declare interface Location {
+  name: string;
+  lat: number;
+  long: number;
+}
+
+/* Create Location Types  */
+declare interface CreateLocationRequest extends NextRequest {
+  body: { name: string; lat: number; long: number };
+}
+
+declare interface CreateLocationResponse extends GenericResponse {
+  name: string;
+}
+
+declare interface CreateLocationError extends GenericError {
+  name: string;
 }
 
 // // Class for markers

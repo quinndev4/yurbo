@@ -5,6 +5,7 @@ import ReactMapGl, { Marker } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { getErrorMessage } from "../constants/errors";
 import { Yurbo } from "@/types/types";
+import Link from "next/link";
 
 interface MapboxMapProps {
   mapboxToken: string;
@@ -35,6 +36,7 @@ export default function MapboxMap({ mapboxToken, yurbos }: MapboxMapProps) {
   // const [yurbos, setYurbos] = useState<Yurbo[]>([]);
 
   useEffect(() => {
+    console.log(yurbos[0].created_at);
     navigator.geolocation.getCurrentPosition((position) => {
       setInitialViewport({
         ...initialViewport,
@@ -57,7 +59,11 @@ export default function MapboxMap({ mapboxToken, yurbos }: MapboxMapProps) {
             initialViewState={initialViewport}
           >
             {markers.map((m) => (
-              <Marker longitude={m.longitude} latitude={m.latitude}></Marker>
+              <Marker
+                key={"m_" + m.latitude.toString() + m.latitude.toString()}
+                longitude={m.longitude}
+                latitude={m.latitude}
+              ></Marker>
             ))}
           </ReactMapGl>
         )}

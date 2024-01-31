@@ -5,10 +5,11 @@ import { FieldHookConfig, useField, useFormik } from "formik";
 import { YUP } from "../../constants/constants";
 import { CreateYurboResponse } from "@/types/types";
 import { getErrorMessgaeSuccess } from "@/app/constants/errors";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Location } from "@/types/types";
 
 interface Values {
-  location: string;
+  name: string;
   lat: number;
   long: number;
 }
@@ -17,27 +18,8 @@ interface Values {
 //   children: React.ReactNode;
 // }
 
-const name = "location";
-const label = "Location";
-
-// const LocationCheckbox = ({ children }: LocationCheckboxProps) => {
-//   // React treats radios and checkbox inputs differently from other input types: select and textarea.
-//   // Formik does this too! When you specify `type` to useField(), it will
-//   // return the correct bag of props for you -- a `checked` prop will be included
-//   // in `field` alongside `name`, `value`, `onChange`, and `onBlur`
-//   const [field, meta] = useField({ type: "checkbox" });
-//   return (
-//     <div>
-//       <label className="checkbox-input">
-//         <input type="checkbox" {...field} {...props} />
-//         {children}
-//       </label>
-//       {meta.touched && meta.error ? (
-//         <div className="error">{meta.error}</div>
-//       ) : null}
-//     </div>
-//   );
-// };
+const name = "name";
+const label = "Name";
 
 export default function Form() {
   // state for loading sign
@@ -64,7 +46,7 @@ export default function Form() {
   };
 
   const formik = useFormik<Values>({
-    initialValues: { [name]: "", lat: 0, long: 0 },
+    initialValues: { name: "", lat: 0, long: 0 },
     validationSchema: Yup.object().shape({
       [name]: Yup.string()
         .min(3, "Must be at least 3 characters")
@@ -87,8 +69,34 @@ export default function Form() {
     });
   };
 
+  const [locations, setLocations] = useState<Location[]>([]);
+
+  const getLocs = async () => {
+    try {
+      const res = await fetch("/api/location/get");
+      const loc_json = await res.json();
+      const locs = loc_json.locations;
+      setLocations(locs);
+    } catch (error) {
+      console.log(
+        "Error occured in Form component getting locations via API: ",
+        error
+      );
+    }
+  };
+
+  useEffect(() => {
+    getLocs();
+  }, []);
+
   return (
     <div className="2xs:w-4/5 xl:w-1/2 bg-blue-600">
+      {/* <div>
+        YOUR LOCATIONS:
+        {locations.map((l: Location) => (
+          <p>{l.name}</p>
+        ))}
+      </div> */}
       <form className="flex flex-col m-5" onSubmit={formik.handleSubmit}>
         <div className="flex flex-col w-full items-start my-5">
           <label htmlFor="location">{label} *</label>
@@ -107,6 +115,21 @@ export default function Form() {
             {formik.errors[name]}
           </p>
         </div>
+
+        {/* LOCATION SELECTOR */}
+        <div className="flex flex-col w-full items-start my-5">
+          <label htmlFor="location">Select the location:</label>
+
+          <select name="locations" id="locations">
+            <option value="default">Default Location</option>
+            {locations.map((option) => (
+              <option key={option.name} value={option.name}>
+                {option.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
         {/* Lat input */}
         <div className="flex flex-col w-full items-start my-5">
           <label htmlFor="lat">latitude *</label>
@@ -122,7 +145,6 @@ export default function Form() {
             {formik.errors.lat}
           </p>
         </div>
-
         {/* Long Input */}
         <div className="flex flex-col w-full items-start my-5">
           <label htmlFor="long">longitude *</label>
@@ -138,7 +160,6 @@ export default function Form() {
             {formik.errors.long}
           </p>
         </div>
-
         {/* Autofill current coordinates */}
         <button
           className="btn-primary m-auto mb-2"
@@ -147,7 +168,6 @@ export default function Form() {
         >
           Current coords
         </button>
-
         <button className="btn-primary m-auto" type="submit">
           Submit
         </button>

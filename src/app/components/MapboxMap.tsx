@@ -28,15 +28,9 @@ export default function MapboxMap({ mapboxToken, yurbos }: MapboxMapProps) {
     name: y.location,
   }));
 
-  const markers1 = [
-    { latitude: 37.7577, longitude: -122.4376, name: "Marker 1" },
-    { latitude: 37.7749, longitude: -122.4194, name: "Marker 2" },
-  ];
-
   // const [yurbos, setYurbos] = useState<Yurbo[]>([]);
 
   useEffect(() => {
-    console.log(yurbos[0].created_at);
     navigator.geolocation.getCurrentPosition((position) => {
       setInitialViewport({
         ...initialViewport,

@@ -14,13 +14,12 @@ import { getServerSession } from "next-auth";
 import { ERRORS, getErrorMessage } from "@/app/constants/errors";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { LOGS } from "@/app/constants/logs";
-import { Yurbo } from "@/types/types";
+import { Act } from "@/types/types";
 
 export async function GET() {
-  function isYurbo(y: any): y is Yurbo {
-    return y && "lat" in y && "long" in y && "name" in y && "created_at" in y;
+  function isLocation(l: any): l is Location {
+    return l && "name" in l && "lat" in l && "long" in l;
   }
-
   try {
     const session = await getServerSession(authOptions);
 
@@ -32,42 +31,37 @@ export async function GET() {
       );
     }
 
-    // get yurbos for this user
-    const yurbo_snapshot = await getDocs(
+    // get acts for this user
+    const act_snapshot = await getDocs(
       query(
-        collection(db, "users", session.user.email, "yurbos")
+        collection(db, "users", session.user.email, "locations")
         // orderBy("timestamp", "desc")
       )
     );
 
-    let yurbos: Yurbo[] = [];
+    // convert snapshot into list of Acts, making sure they are assignable to Act
+    let locations: Location[] = [];
 
-    yurbo_snapshot.forEach((doc) => {
-      const y = doc.data();
-      if (y && isYurbo(y)) {
-        yurbos.push(y);
+    act_snapshot.forEach((doc) => {
+      const l = doc.data();
+      if (isLocation(l)) {
+        locations.push(l);
       } else {
-        console.error("datum is not assignable to a yurbo...", y);
+        console.error("datum is not assignable to a location...", l);
       }
     });
 
-    // const yurbos = yurbo_snapshot.map((doc) => doc.data());
-
-    // console.log(yurbos);
-    // yurbos.forEach((yurbo) => console.log(yurbo));
-
-    // const yurbos = yurbo_snapshot.docs.map((doc) => {
-    //   doc.data();
-    // });
-
     // return successful response
-    console.log(LOGS.YURBO.GOT, "for user", session.user.email, yurbos);
-    return Response.json({ yurbos });
+    console.log(LOGS.LOCATION.GOT, "for user", session.user.email, locations);
+    return Response.json({ locations });
   } catch (error) {
     const errorMessage = getErrorMessage(error);
 
     // failure
-    console.error(ERRORS.YURBO.GOT, JSON.stringify({ message: errorMessage }));
+    console.error(
+      ERRORS.LOCATION.GOT,
+      JSON.stringify({ message: errorMessage })
+    );
     return Response.json(
       { mesage: errorMessage, success: false },
       { status: 500 }

@@ -23,9 +23,7 @@ import { LOGS } from "@/app/constants/logs";
 async function getYurbos() {
   // Type guard function (know if this is right!)
   function isYurbo(y: any): y is Yurbo {
-    return (
-      y && "lat" in y && "long" in y && "location" in y && "created_at" in y
-    );
+    return y && "lat" in y && "long" in y && "name" in y && "created_at" in y;
   }
   try {
     const session = await getServerSession(authOptions);
@@ -103,14 +101,14 @@ export default async function Map() {
               key={y.lat.toString() + y.long.toString()}
               className="flex flex-row justify-between"
             >
-              <li key={"loc " + y.location} className="">
-                {y.location}
+              <li key={"loc " + y.name} className="">
+                {y.name}
               </li>
               <li key={"coord " + y.lat} className="pr-2">
                 {y.lat} x {y.long}
               </li>
               {y.created_at && (
-                <li key={y.location} className="pr-4">
+                <li key={y.name} className="pr-4">
                   {new Date(y.created_at.seconds * 1000).toLocaleDateString()}
                 </li>
               )}

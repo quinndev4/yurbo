@@ -60,12 +60,19 @@ declare interface GetYurbosError extends GenericError {
   yurbos: Yurbo[];
 }
 
+// Location class, for grouping yurbos together
+declare interface Location {
+  name: string;
+  lat: number;
+  long: number;
+}
+
 /* Class for a Yurbo */
 declare interface Yurbo {
   act?: Act;
   created_at: Timestamp;
-  location: string;
-  name?: string;
+  location?: Location;
+  name: string;
   lat: number;
   long: number;
 }
@@ -74,12 +81,6 @@ declare interface Yurbo {
 declare interface Act {
   name: string;
   created_at: Timestamp;
-}
-
-declare interface Location {
-  name: string;
-  lat: number;
-  long: number;
 }
 
 /* Create Location Types  */

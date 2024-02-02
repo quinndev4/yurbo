@@ -43,7 +43,7 @@ export async function GET() {
     let locations: Location[] = [];
 
     act_snapshot.forEach((doc) => {
-      const l = doc.data();
+      const l = { id: doc.id, ...doc.data() };
       if (isLocation(l)) {
         locations.push(l);
       } else {

@@ -25,7 +25,7 @@ export default function MapboxMap({ mapboxToken, yurbos }: MapboxMapProps) {
   const markers = yurbos.map((y) => ({
     latitude: y.lat,
     longitude: y.long,
-    name: y.location,
+    name: y.name,
   }));
 
   // const [yurbos, setYurbos] = useState<Yurbo[]>([]);

@@ -9,7 +9,7 @@ import { ERRORS, getErrorMessage } from "@/app/constants/errors";
 export async function POST(request: CreateYurboRequest) {
   const body = await request.json();
 
-  const { name, lat, long } = body; // js destructuring
+  const { name, lat, long, loc_id } = body; // js destructuring
 
   try {
     const session = await getServerSession(authOptions);
@@ -29,13 +29,14 @@ export async function POST(request: CreateYurboRequest) {
       name,
       lat,
       long,
+      location_id: loc_id,
       created_at: serverTimestamp(),
     });
 
     // return successful response
     console.log(LOGS.YURBO.CREATED, name, lat, long);
     return Response.json(
-      { message: LOGS.YURBO.CREATED, success: true, name, lat, long },
+      { message: LOGS.YURBO.CREATED, success: true, name, lat, long, loc_id },
       { status: 200 }
     );
   } catch (error) {

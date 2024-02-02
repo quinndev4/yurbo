@@ -43,22 +43,14 @@ export async function GET() {
     let yurbos: Yurbo[] = [];
 
     yurbo_snapshot.forEach((doc) => {
-      const y = doc.data();
+      const y = { id: doc.id, ...doc.data() };
+      // console.log("yurbo y", y);
       if (y && isYurbo(y)) {
         yurbos.push(y);
       } else {
         console.error("datum is not assignable to a yurbo...", y);
       }
     });
-
-    // const yurbos = yurbo_snapshot.map((doc) => doc.data());
-
-    // console.log(yurbos);
-    // yurbos.forEach((yurbo) => console.log(yurbo));
-
-    // const yurbos = yurbo_snapshot.docs.map((doc) => {
-    //   doc.data();
-    // });
 
     // return successful response
     console.log(LOGS.YURBO.GOT, "for user", session.user.email, yurbos);

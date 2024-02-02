@@ -43,7 +43,7 @@ export async function GET() {
     let acts: Act[] = [];
 
     act_snapshot.forEach((doc) => {
-      const a = doc.data();
+      const a = { id: doc.id, ...doc.data() };
       if (isAct(a)) {
         acts.push(a);
       } else {

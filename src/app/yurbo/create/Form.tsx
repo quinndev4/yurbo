@@ -12,11 +12,8 @@ interface Values {
   name: string;
   lat: number;
   long: number;
+  loc_id: string;
 }
-
-// interface LocationCheckboxProps extends FieldHookConfig<string>{
-//   children: React.ReactNode;
-// }
 
 const name = "name";
 const label = "Name";
@@ -25,8 +22,11 @@ export default function Form() {
   // state for loading sign
   const [areCoordsLoading, setAreCoordsLoading] = useState(false);
 
+  const [locations, setLocations] = useState<Location[]>([]);
+
   const onSubmit = async (formikValues: Values) => {
     try {
+      console.log("formik vals", formikValues);
       const res = await fetch("/api/yurbo/create", {
         method: "POST",
         body: JSON.stringify(formikValues),
@@ -46,7 +46,7 @@ export default function Form() {
   };
 
   const formik = useFormik<Values>({
-    initialValues: { name: "", lat: 0, long: 0 },
+    initialValues: { name: "", lat: 0, long: 0, loc_id: "" },
     validationSchema: Yup.object().shape({
       [name]: Yup.string()
         .min(3, "Must be at least 3 characters")
@@ -54,6 +54,12 @@ export default function Form() {
 
       lat: Yup.number().required(YUP.REQUIRED),
       long: Yup.number().required(YUP.REQUIRED),
+      loc_id: Yup.string()
+        .oneOf(
+          locations.map((l) => l.id),
+          "invalid location"
+        )
+        .required(YUP.REQUIRED),
     }),
     onSubmit,
   });
@@ -68,8 +74,6 @@ export default function Form() {
       formik.setFieldValue("lat", position.coords.latitude);
     });
   };
-
-  const [locations, setLocations] = useState<Location[]>([]);
 
   const getLocs = async () => {
     try {
@@ -89,14 +93,16 @@ export default function Form() {
     getLocs();
   }, []);
 
+  useEffect(() => {
+    const selectedLoc = locations.find((l) => l.id === formik.values.loc_id);
+    if (selectedLoc) {
+      formik.setFieldValue("long", selectedLoc.long);
+      formik.setFieldValue("lat", selectedLoc.lat);
+    }
+  }, [formik.values.loc_id]);
+
   return (
     <div className="2xs:w-4/5 xl:w-1/2 bg-blue-600">
-      {/* <div>
-        YOUR LOCATIONS:
-        {locations.map((l: Location) => (
-          <p>{l.name}</p>
-        ))}
-      </div> */}
       <form className="flex flex-col m-5" onSubmit={formik.handleSubmit}>
         <div className="flex flex-col w-full items-start my-5">
           <label htmlFor="location">{label} *</label>
@@ -118,16 +124,30 @@ export default function Form() {
 
         {/* LOCATION SELECTOR */}
         <div className="flex flex-col w-full items-start my-5">
-          <label htmlFor="location">Select the location:</label>
+          <label htmlFor="loc_id">Select the location:</label>
 
-          <select name="locations" id="locations">
-            <option value="default">Default Location</option>
-            {locations.map((option) => (
-              <option key={option.name} value={option.name}>
+          <select
+            // name="locations"
+            id="loc_id"
+            // onChange={(e) =>
+            //   setSelectedLoc(locations[parseInt(e.target.value)])
+            // }
+            {...formik.getFieldProps("loc_id")}
+          >
+            <option value="">Select a Location</option>
+            {locations.map((option, index) => (
+              <option key={option.id} value={option.id}>
                 {option.name}
               </option>
             ))}
           </select>
+          <p
+            className={`text-red-600 h-5 ${
+              !formik.errors.loc_id && "invisible"
+            }`}
+          >
+            {formik.errors.loc_id}
+          </p>
         </div>
 
         {/* Lat input */}

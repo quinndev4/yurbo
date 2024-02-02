@@ -47,7 +47,7 @@ async function getYurbos() {
 
     // populate yurbos array. Not sure whats the best way to do type stuff but i tried
     yurbo_snapshot.forEach((doc) => {
-      const y = doc.data();
+      const y = { id: doc.id, ...doc.data() };
       // ensure data exists && is a Yurbo before pushing
       if (isYurbo(y)) {
         yurbos.push(y);

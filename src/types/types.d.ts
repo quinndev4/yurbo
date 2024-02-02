@@ -62,6 +62,7 @@ declare interface GetYurbosError extends GenericError {
 
 // Location class, for grouping yurbos together
 declare interface Location {
+  id: string;
   name: string;
   lat: number;
   long: number;
@@ -69,9 +70,10 @@ declare interface Location {
 
 /* Class for a Yurbo */
 declare interface Yurbo {
-  act?: Act;
+  id: string;
   created_at: Timestamp;
-  location?: Location;
+  location_id?: string;
+  act_id?: string;
   name: string;
   lat: number;
   long: number;
@@ -79,6 +81,7 @@ declare interface Yurbo {
 
 /* Class for Event/Activity */
 declare interface Act {
+  id: string;
   name: string;
   created_at: Timestamp;
 }

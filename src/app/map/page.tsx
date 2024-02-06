@@ -1,9 +1,9 @@
-import { Yurbo } from "@/types/types";
-import MapboxMap from "../components/MapboxMap";
-import { ERRORS, getErrorMessage } from "../constants/errors";
+import { Yurbo } from '@/types/types';
+import MapboxMap from '../components/MapboxMap';
+import { ERRORS, getErrorMessage } from '../constants/errors';
 
-import { db } from "../../firebase";
-import { useCollection } from "react-firebase-hooks/firestore";
+import { db } from '../../firebase';
+import { useCollection } from 'react-firebase-hooks/firestore';
 import {
   doc,
   setDoc,
@@ -14,17 +14,17 @@ import {
   where,
   getDocs,
   Timestamp,
-} from "firebase/firestore";
-import { getServerSession } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]/route";
-import { LOGS } from "@/app/constants/logs";
+} from 'firebase/firestore';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../api/auth/[...nextauth]/route';
+import { LOGS } from '@/app/constants/logs';
 
 // extrapolated logic from api... need to fix caching
 async function getYurbos() {
   // Type guard function (know if this is right!)
   function isYurbo(y: any): y is Yurbo {
     return (
-      y && "lat" in y && "long" in y && "location" in y && "created_at" in y
+      y && 'lat' in y && 'long' in y && 'location' in y && 'created_at' in y
     );
   }
   try {
@@ -40,7 +40,7 @@ async function getYurbos() {
     // get yurbos for this user
     const yurbo_snapshot = await getDocs(
       query(
-        collection(db, "users", session.user.email, "yurbos")
+        collection(db, 'users', session.user.email, 'yurbos')
         // orderBy("timestamp", "desc")
       )
     );
@@ -54,11 +54,11 @@ async function getYurbos() {
       if (isYurbo(y)) {
         yurbos.push(y);
       } else {
-        console.error("A datum does not conform to Yurbo interface:", y);
+        console.error('A datum does not conform to Yurbo interface:', y);
       }
     });
 
-    console.log(LOGS.YURBO.GOT, "for user", session.user.email, yurbos);
+    console.log(LOGS.YURBO.GOT, 'for user', session.user.email, yurbos);
     return Response.json({ yurbos });
   } catch (error) {
     const errorMessage = getErrorMessage(error);
@@ -79,38 +79,37 @@ export default async function Map() {
   const data = await res.json(); // had to split these into two awaits
   const yurbos = data.yurbos;
 
-  console.log("Yurboooos", yurbos);
+  console.log('Yurboooos', yurbos);
 
   //   make sure types are correct
   if (mapbox_token === undefined) {
-    console.log("Token is undefined ..");
-    mapbox_token = "";
+    console.log('Token is undefined ..');
+    mapbox_token = '';
   }
 
   return (
-    <div className="flex h-screen">
+    <div className='flex h-screen'>
       {/* Left Screen: List of Yurbos */}
-      <div className="hidden sm:block md:w-1/2 md:h-screen md:pt-16 md:ml-5">
-        <div className="flex flex-row justify-between mr-5 border-b mb-2 pb-1">
-          <h2 className="font-bold text-lg">Your Yurbos</h2>
-          <h2 className="font-bold">Coordinates</h2>
-          <h2 className="font-bold">Created on</h2>
+      <div className='hidden sm:block md:w-1/2 md:h-screen md:pt-16 md:ml-5'>
+        <div className='flex flex-row justify-between mr-5 border-b mb-2 pb-1'>
+          <h2 className='font-bold text-lg'>Your Yurbos</h2>
+          <h2 className='font-bold'>Coordinates</h2>
+          <h2 className='font-bold'>Created on</h2>
         </div>
 
         <ul>
           {yurbos?.map((y: Yurbo) => (
             <div
               key={y.lat.toString() + y.long.toString()}
-              className="flex flex-row justify-between"
-            >
-              <li key={"loc " + y.location} className="">
+              className='flex flex-row justify-between'>
+              <li key={'loc ' + y.location} className=''>
                 {y.location}
               </li>
-              <li key={"coord " + y.lat} className="pr-2">
+              <li key={'coord ' + y.lat} className='pr-2'>
                 {y.lat} x {y.long}
               </li>
               {y.created_at && (
-                <li key={y.location} className="pr-4">
+                <li key={y.location} className='pr-4'>
                   {new Date(y.created_at.seconds * 1000).toLocaleDateString()}
                 </li>
               )}
@@ -120,7 +119,7 @@ export default async function Map() {
       </div>
 
       {/* Right Screen: Map */}
-      <div className="h-full w-full md:w-1/2">
+      <div className='h-full w-full md:w-1/2'>
         <MapboxMap mapboxToken={mapbox_token} yurbos={yurbos} />
       </div>
     </div>

@@ -1,5 +1,5 @@
-import { db } from "../../../../firebase";
-import { useCollection } from "react-firebase-hooks/firestore";
+import { db } from '../../../../firebase';
+import { useCollection } from 'react-firebase-hooks/firestore';
 import {
   doc,
   setDoc,
@@ -9,16 +9,16 @@ import {
   query,
   where,
   getDocs,
-} from "firebase/firestore";
-import { getServerSession } from "next-auth";
-import { ERRORS, getErrorMessage } from "@/app/constants/errors";
-import { authOptions } from "../../auth/[...nextauth]/route";
-import { LOGS } from "@/app/constants/logs";
-import { Act } from "@/types/types";
+} from 'firebase/firestore';
+import { getServerSession } from 'next-auth';
+import { ERRORS, getErrorMessage } from '@/app/constants/errors';
+import { authOptions } from '../../auth/[...nextauth]/route';
+import { LOGS } from '@/app/constants/logs';
+import { Act } from '@/types/types';
 
 export async function GET() {
   function isAct(a: any): a is Act {
-    return a && "name" in a && "created_at" in a;
+    return a && 'name' in a && 'created_at' in a;
   }
   try {
     const session = await getServerSession(authOptions);
@@ -34,7 +34,7 @@ export async function GET() {
     // get acts for this user
     const act_snapshot = await getDocs(
       query(
-        collection(db, "users", session.user.email, "events")
+        collection(db, 'users', session.user.email, 'events')
         // orderBy("timestamp", "desc")
       )
     );
@@ -47,12 +47,12 @@ export async function GET() {
       if (isAct(a)) {
         acts.push(a);
       } else {
-        console.error("datum is not assignable to a yurbo...", a);
+        console.error('datum is not assignable to a yurbo...', a);
       }
     });
 
     // return successful response
-    console.log(LOGS.YURBO.GOT, "for user", session.user.email, acts);
+    console.log(LOGS.YURBO.GOT, 'for user', session.user.email, acts);
     return Response.json({ acts });
   } catch (error) {
     const errorMessage = getErrorMessage(error);

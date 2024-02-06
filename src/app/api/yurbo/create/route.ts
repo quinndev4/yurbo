@@ -1,10 +1,10 @@
-import { getServerSession } from "next-auth";
-import { CreateYurboRequest, CreateYurboResponse } from "@/types/types";
-import { authOptions } from "../../auth/[...nextauth]/route";
-import { doc, setDoc, collection, serverTimestamp } from "firebase/firestore";
-import { db } from "@/firebase";
-import { LOGS } from "@/app/constants/logs";
-import { ERRORS, getErrorMessage } from "@/app/constants/errors";
+import { getServerSession } from 'next-auth';
+import { CreateYurboRequest, CreateYurboResponse } from '@/types/types';
+import { authOptions } from '../../auth/[...nextauth]/route';
+import { doc, setDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { db } from '@/firebase';
+import { LOGS } from '@/app/constants/logs';
+import { ERRORS, getErrorMessage } from '@/app/constants/errors';
 
 export async function POST(request: CreateYurboRequest) {
   const body = await request.json();
@@ -22,7 +22,7 @@ export async function POST(request: CreateYurboRequest) {
       );
     }
 
-    const docRef = doc(collection(db, "users", session.user.email, "yurbos"));
+    const docRef = doc(collection(db, 'users', session.user.email, 'yurbos'));
 
     // add new personal yurbo
     await setDoc(docRef, {

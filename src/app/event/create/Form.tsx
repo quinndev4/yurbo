@@ -59,8 +59,7 @@ export default function Form() {
           <p
             className={`text-red-600 h-5 ${
               !formik.errors[name] && 'invisible'
-            }`}
-          >
+            }`}>
             {formik.errors[name]}
           </p>
         </div>

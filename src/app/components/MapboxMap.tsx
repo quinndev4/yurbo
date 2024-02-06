@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useEffect, useRef, useState } from "react";
-import ReactMapGl, { Marker } from "react-map-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
-import { getErrorMessage } from "../constants/errors";
-import { Yurbo } from "@/types/types";
-import Link from "next/link";
+import { useEffect, useRef, useState } from 'react';
+import ReactMapGl, { Marker } from 'react-map-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
+import { getErrorMessage } from '../constants/errors';
+import { Yurbo } from '@/types/types';
+import Link from 'next/link';
 
 interface MapboxMapProps {
   mapboxToken: string;
@@ -18,8 +18,8 @@ export default function MapboxMap({ mapboxToken, yurbos }: MapboxMapProps) {
     latitude: -999,
     longitude: -999,
     zoom: 11,
-    width: "100%",
-    height: "100%",
+    width: '100%',
+    height: '100%',
   });
 
   const markers = yurbos.map((y) => ({
@@ -29,8 +29,8 @@ export default function MapboxMap({ mapboxToken, yurbos }: MapboxMapProps) {
   }));
 
   const markers1 = [
-    { latitude: 37.7577, longitude: -122.4376, name: "Marker 1" },
-    { latitude: 37.7749, longitude: -122.4194, name: "Marker 2" },
+    { latitude: 37.7577, longitude: -122.4376, name: 'Marker 1' },
+    { latitude: 37.7749, longitude: -122.4194, name: 'Marker 2' },
   ];
 
   // const [yurbos, setYurbos] = useState<Yurbo[]>([]);
@@ -43,8 +43,8 @@ export default function MapboxMap({ mapboxToken, yurbos }: MapboxMapProps) {
         latitude: position.coords.latitude,
         longitude: position.coords.longitude,
         zoom: 11,
-        width: "100%",
-        height: "100%",
+        width: '100%',
+        height: '100%',
       });
     });
   }, []);
@@ -54,16 +54,14 @@ export default function MapboxMap({ mapboxToken, yurbos }: MapboxMapProps) {
       {initialViewport.latitude != -999 &&
         initialViewport.longitude != -999 && (
           <ReactMapGl
-            mapStyle="mapbox://styles/david-ham/clr6mfjmg010z01qu02xbhf0w"
+            mapStyle='mapbox://styles/david-ham/clr6mfjmg010z01qu02xbhf0w'
             mapboxAccessToken={mapboxToken}
-            initialViewState={initialViewport}
-          >
+            initialViewState={initialViewport}>
             {markers.map((m) => (
               <Marker
-                key={"m_" + m.latitude.toString() + m.latitude.toString()}
+                key={'m_' + m.latitude.toString() + m.latitude.toString()}
                 longitude={m.longitude}
-                latitude={m.latitude}
-              ></Marker>
+                latitude={m.latitude}></Marker>
             ))}
           </ReactMapGl>
         )}

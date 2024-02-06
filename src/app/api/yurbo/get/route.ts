@@ -1,5 +1,5 @@
-import { db } from "../../../../firebase";
-import { useCollection } from "react-firebase-hooks/firestore";
+import { db } from '../../../../firebase';
+import { useCollection } from 'react-firebase-hooks/firestore';
 import {
   doc,
   setDoc,
@@ -9,17 +9,17 @@ import {
   query,
   where,
   getDocs,
-} from "firebase/firestore";
-import { getServerSession } from "next-auth";
-import { ERRORS, getErrorMessage } from "@/app/constants/errors";
-import { authOptions } from "../../auth/[...nextauth]/route";
-import { LOGS } from "@/app/constants/logs";
-import { Yurbo } from "@/types/types";
+} from 'firebase/firestore';
+import { getServerSession } from 'next-auth';
+import { ERRORS, getErrorMessage } from '@/app/constants/errors';
+import { authOptions } from '../../auth/[...nextauth]/route';
+import { LOGS } from '@/app/constants/logs';
+import { Yurbo } from '@/types/types';
 
 export async function GET() {
   function isYurbo(y: any): y is Yurbo {
     return (
-      y && "lat" in y && "long" in y && "location" in y && "created_at" in y
+      y && 'lat' in y && 'long' in y && 'location' in y && 'created_at' in y
     );
   }
 
@@ -37,7 +37,7 @@ export async function GET() {
     // get yurbos for this user
     const yurbo_snapshot = await getDocs(
       query(
-        collection(db, "users", session.user.email, "yurbos")
+        collection(db, 'users', session.user.email, 'yurbos')
         // orderBy("timestamp", "desc")
       )
     );
@@ -49,7 +49,7 @@ export async function GET() {
       if (y && isYurbo(y)) {
         yurbos.push(y);
       } else {
-        console.error("datum is not assignable to a yurbo...", y);
+        console.error('datum is not assignable to a yurbo...', y);
       }
     });
 
@@ -63,7 +63,7 @@ export async function GET() {
     // });
 
     // return successful response
-    console.log(LOGS.YURBO.GOT, "for user", session.user.email, yurbos);
+    console.log(LOGS.YURBO.GOT, 'for user', session.user.email, yurbos);
     return Response.json({ yurbos });
   } catch (error) {
     const errorMessage = getErrorMessage(error);

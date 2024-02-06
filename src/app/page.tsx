@@ -27,8 +27,7 @@ export default function Home() {
 
           <button
             className='btn-primary mt-20'
-            onClick={() => signIn('google')}
-          >
+            onClick={() => signIn('google')}>
             Sign In
           </button>
         </div>

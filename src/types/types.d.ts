@@ -1,5 +1,5 @@
-import { Timestamp } from "firebase/firestore";
-import { NextRequest, NextResponse } from "next/server";
+import { Timestamp } from 'firebase/firestore';
+import { NextRequest, NextResponse } from 'next/server';
 
 interface GenericResponse {
   success: boolean;

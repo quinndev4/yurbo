@@ -16,7 +16,7 @@ interface Values {
 export default function Form() {
   const onSubmit = async (formikValues: Values) => {
     try {
-      const res = await fetch('/api/event/create', {
+      const res = await fetch('/api/event', {
         method: 'POST',
         body: JSON.stringify(formikValues),
       });
@@ -59,7 +59,8 @@ export default function Form() {
           <p
             className={`text-red-600 h-5 ${
               !formik.errors[name] && 'invisible'
-            }`}>
+            }`}
+          >
             {formik.errors[name]}
           </p>
         </div>

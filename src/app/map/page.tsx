@@ -3,18 +3,7 @@ import MapboxMap from '../components/MapboxMap';
 import { ERRORS, getErrorMessage } from '../constants/errors';
 
 import { db } from '../../firebase';
-import { useCollection } from 'react-firebase-hooks/firestore';
-import {
-  doc,
-  setDoc,
-  serverTimestamp,
-  collection,
-  orderBy,
-  query,
-  where,
-  getDocs,
-  Timestamp,
-} from 'firebase/firestore';
+import { collection, query, getDocs } from 'firebase/firestore';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../api/auth/[...nextauth]/route';
 import { LOGS } from '@/app/constants/logs';
@@ -101,7 +90,8 @@ export default async function Map() {
           {yurbos?.map((y: Yurbo) => (
             <div
               key={y.lat.toString() + y.long.toString()}
-              className='flex flex-row justify-between'>
+              className='flex flex-row justify-between'
+            >
               <li key={'loc ' + y.location} className=''>
                 {y.location}
               </li>

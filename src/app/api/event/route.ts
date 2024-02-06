@@ -1,5 +1,4 @@
-import { db } from '../../../../firebase';
-import { useCollection } from 'react-firebase-hooks/firestore';
+import { db } from '../../../firebase';
 import {
   doc,
   setDoc,
@@ -12,9 +11,9 @@ import {
 } from 'firebase/firestore';
 import { getServerSession } from 'next-auth';
 import { ERRORS, getErrorMessage } from '@/app/constants/errors';
-import { authOptions } from '../../auth/[...nextauth]/route';
+import { authOptions } from '../auth/[...nextauth]/route';
 import { LOGS } from '@/app/constants/logs';
-import { Act } from '@/types/types';
+import { Act, CreateEventRequest } from '@/types/types';
 
 export async function GET() {
   function isAct(a: any): a is Act {
@@ -61,6 +60,51 @@ export async function GET() {
     console.error(ERRORS.YURBO.GOT, JSON.stringify({ message: errorMessage }));
     return Response.json(
       { mesage: errorMessage, success: false },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: CreateEventRequest) {
+  const body = await request.json();
+
+  const { eventName } = body;
+
+  try {
+    const session = await getServerSession(authOptions);
+
+    // no user found in session
+    if (!session?.user?.email) {
+      return Response.json(
+        { success: false, mesage: ERRORS.UNATHORIZED },
+        { status: 401 }
+      );
+    }
+
+    const docRef = doc(collection(db, 'users', session.user.email, 'events'));
+
+    // add new personal event
+    await setDoc(docRef, {
+      name: eventName,
+      created_at: serverTimestamp(),
+    });
+
+    // return successful response
+    console.log(LOGS.EVENT.CREATED, eventName);
+    return Response.json(
+      { message: LOGS.EVENT.CREATED, success: true, eventName },
+      { status: 200 }
+    );
+  } catch (error) {
+    const errorMessage = getErrorMessage(error);
+
+    // failure
+    console.error(
+      ERRORS.EVENT.CREATED,
+      JSON.stringify({ message: errorMessage, eventName })
+    );
+    return Response.json(
+      { mesage: errorMessage, success: false, eventName },
       { status: 500 }
     );
   }

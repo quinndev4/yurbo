@@ -102,7 +102,8 @@ export default function Form() {
           <p
             className={`text-red-600 h-5 ${
               !formik.errors[name] && 'invisible'
-            }`}>
+            }`}
+          >
             {formik.errors[name]}
           </p>
         </div>
@@ -116,7 +117,8 @@ export default function Form() {
             {...formik.getFieldProps('lat')}
           />
           <p
-            className={`text-red-600 h-5 ${!formik.errors.lat && 'invisible'}`}>
+            className={`text-red-600 h-5 ${!formik.errors.lat && 'invisible'}`}
+          >
             {formik.errors.lat}
           </p>
         </div>
@@ -131,9 +133,8 @@ export default function Form() {
             {...formik.getFieldProps('long')}
           />
           <p
-            className={`text-red-600 h-5 ${
-              !formik.errors.long && 'invisible'
-            }`}>
+            className={`text-red-600 h-5 ${!formik.errors.long && 'invisible'}`}
+          >
             {formik.errors.long}
           </p>
         </div>
@@ -142,7 +143,8 @@ export default function Form() {
         <button
           className='btn-primary m-auto mb-2'
           type='button'
-          onClick={getLoc}>
+          onClick={getLoc}
+        >
           Current coords
         </button>
 

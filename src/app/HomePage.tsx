@@ -12,7 +12,8 @@ export default function HomePage() {
       </Link>
       <Link
         href={'/location/create'}
-        className='rounded-lg border-2 border-white'>
+        className='rounded-lg border-2 border-white'
+      >
         Create a new Location
       </Link>
       <Link href={'/map'} className='rounded-lg border-2 border-white'>

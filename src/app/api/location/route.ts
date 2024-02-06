@@ -1,6 +1,6 @@
 import { getServerSession } from 'next-auth';
 import { CreateLocationRequest } from '@/types/types';
-import { authOptions } from '../../auth/[...nextauth]/route';
+import { authOptions } from '../auth/[...nextauth]/route';
 import { doc, setDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/firebase';
 import { LOGS } from '@/app/constants/logs';

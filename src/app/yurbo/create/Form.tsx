@@ -6,12 +6,12 @@ import { YUP } from '../../constants/constants';
 import { CreateYurboResponse } from '@/types/types';
 import { getErrorMessgaeSuccess } from '@/app/constants/errors';
 
-interface Values {
-  location: string;
-}
-
 const name = 'location';
 const label = 'Location';
+
+interface Values {
+  [name]: string;
+}
 
 export default function Form() {
   const onSubmit = async (formikValues: Values) => {
@@ -50,10 +50,10 @@ export default function Form() {
         <div className='flex flex-col w-full items-start my-5'>
           <label htmlFor='location'>{label} *</label>
           <input
-            className='text-black text-left w-1/4'
+            className='text-black text-left w-1/4 rounded-lg'
             id={name}
             type='text'
-            placeholder={`Enter ${label}`}
+            placeholder={` Enter ${label}`}
             {...formik.getFieldProps(name)}
           />
           <p

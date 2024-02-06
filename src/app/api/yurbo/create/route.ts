@@ -7,11 +7,11 @@ import { LOGS } from '@/app/constants/logs';
 import { ERRORS, getErrorMessage } from '@/app/constants/errors';
 
 export async function POST(request: CreateEventRequest) {
-  const body = await request.json();
-
-  const { location } = body;
-
   try {
+    const body = await request.json();
+
+    const { location } = body;
+
     const session = await getServerSession(authOptions);
 
     // no user found in session
@@ -22,11 +22,12 @@ export async function POST(request: CreateEventRequest) {
       );
     }
 
-    const docRef = doc(collection(db, 'users', session.user.email, 'yurbos'));
+    const docRef = doc(collection(db, 'posts'));
 
     // add new personal event
     await setDoc(docRef, {
       location,
+      user: session.user.email,
       created_at: serverTimestamp(),
     });
 

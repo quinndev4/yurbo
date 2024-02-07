@@ -31,10 +31,10 @@ export default async function Map() {
               key={y.lat.toString() + y.long.toString()}
               className='flex flex-row justify-between'
             >
-              <li key={'loc ' + y.location_id} className=''>
+              <li key={`loc-${y.location_id}`} className=''>
                 {y.location_id}
               </li>
-              <li key={'coord ' + y.lat} className='pr-2'>
+              <li key={`coord${y.lat}`} className='pr-2'>
                 {y.lat} x {y.long}
               </li>
               {y.created_at && (

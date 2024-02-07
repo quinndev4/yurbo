@@ -1,8 +1,9 @@
 'use client';
 
-import { useSession, signIn } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import HomePage from './HomePage';
 import { RotatingLines } from 'react-loader-spinner';
+import SignInButton from './components/SignInButton';
 
 export default function Home() {
   const { data: session, status } = useSession();
@@ -23,13 +24,9 @@ export default function Home() {
         </div>
       ) : (
         <div className='flex flex-col'>
-          <h1 className='text-3xl font-bold'>Yurbo</h1>
+          <h1 className='text-3xl font-bold mb-20'>Yurbo</h1>
 
-          <button
-            className='btn-primary mt-20'
-            onClick={() => signIn('google')}>
-            Sign In
-          </button>
+          <SignInButton />
         </div>
       )}
     </main>

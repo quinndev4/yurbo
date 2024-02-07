@@ -1,15 +1,15 @@
 import { getServerSession } from 'next-auth';
-import { CreateEventRequest } from '@/types/types';
-import { authOptions } from '../../auth/[...nextauth]/route';
+import { CreateLocationRequest } from '@/types/types';
+import { authOptions } from '../auth/[...nextauth]/route';
 import { doc, setDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/firebase';
 import { LOGS } from '@/app/constants/logs';
 import { ERRORS, getErrorMessage } from '@/app/constants/errors';
 
-export async function POST(request: CreateEventRequest) {
+export async function POST(request: CreateLocationRequest) {
   const body = await request.json();
 
-  const { location } = body;
+  const { name, lat, long } = body; // js destructuring
 
   try {
     const session = await getServerSession(authOptions);
@@ -17,23 +17,26 @@ export async function POST(request: CreateEventRequest) {
     // no user found in session
     if (!session?.user?.email) {
       return Response.json(
-        { success: false, mesage: ERRORS.UNATHORIZED },
+        { success: false, message: ERRORS.UNATHORIZED },
         { status: 401 }
       );
     }
 
-    const docRef = doc(collection(db, 'users', session.user.email, 'yurbos'));
+    const docRef = doc(
+      collection(db, 'users', session.user.email, 'locations')
+    );
 
-    // add new personal event
+    // add new personal yurbo
     await setDoc(docRef, {
-      location,
-      created_at: serverTimestamp(),
+      name,
+      lat,
+      long,
     });
 
     // return successful response
-    console.log(LOGS.YURBO.CREATED, location);
+    console.log(LOGS.LOCATION.CREATED, name, lat, long);
     return Response.json(
-      { message: LOGS.YURBO.CREATED, success: true, location },
+      { message: LOGS.LOCATION.CREATED, success: true, name, lat, long },
       { status: 200 }
     );
   } catch (error) {
@@ -41,11 +44,11 @@ export async function POST(request: CreateEventRequest) {
 
     // failure
     console.error(
-      ERRORS.YURBO.CREATED,
-      JSON.stringify({ message: errorMessage, location })
+      ERRORS.LOCATION.CREATED,
+      JSON.stringify({ message: errorMessage, name, lat, long })
     );
     return Response.json(
-      { mesage: errorMessage, success: false, location },
+      { mesage: errorMessage, success: false, name, lat, long },
       { status: 500 }
     );
   }

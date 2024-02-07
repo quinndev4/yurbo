@@ -16,7 +16,7 @@ interface Values {
 export default function Form() {
   const onSubmit = async (formikValues: Values) => {
     try {
-      const res = await fetch('/api/event/create', {
+      const res = await fetch('/api/event', {
         method: 'POST',
         body: JSON.stringify(formikValues),
       });

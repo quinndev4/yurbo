@@ -2,8 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import NextAuthProvider from './NextAuthProvider';
-import Link from 'next/link';
-import SignOutButton from './components/SignOutButton';
+import NavBar from './components/NavBar';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -15,6 +14,7 @@ export const metadata: Metadata = {
   description: '',
 };
 
+// TODO: have navbar show up only when signed in. can make a separate client componenet for this
 export default function RootLayout({
   children,
 }: {
@@ -23,18 +23,9 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body
-        className={`${inter.className} text-black bg-white dark:text-white dark:bg-black`}
-      >
+        className={`${inter.className} text-black bg-white dark:text-white dark:bg-black`}>
         <NextAuthProvider>
-          {/* Nav Bar */}
-          <header className='flex justify-between h-20 mx-8 items-center'>
-            {/* Home logo */}
-            <Link className='hover:cursor-pointer text-3xl font-bold' href='/'>
-              Yurbo
-            </Link>
-
-            <SignOutButton />
-          </header>
+          <NavBar />
 
           {children}
         </NextAuthProvider>

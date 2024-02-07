@@ -1,13 +1,13 @@
 export const LOGS = {
   EVENT: {
-    CREATED: "Event successfully created",
+    CREATED: 'Event successfully created',
   },
   YURBO: {
-    CREATED: "Yurbo successfully created",
-    GOT: "Yurbos successfully retrieved",
+    CREATED: 'Yurbo successfully created',
+    GOT: 'Yurbos successfully retrieved',
   },
   LOCATION: {
-    CREATED: "Location successfully created",
-    GOT: "Locations successfully retrieved",
+    CREATED: 'Location successfully created',
+    GOT: 'Locations successfully retrieved',
   },
 };

@@ -1,10 +1,38 @@
-import { getServerSession } from "next-auth";
-import { CreateYurboRequest, CreateYurboResponse } from "@/types/types";
-import { authOptions } from "../../auth/[...nextauth]/route";
-import { doc, setDoc, collection, serverTimestamp } from "firebase/firestore";
-import { db } from "@/firebase";
-import { LOGS } from "@/app/constants/logs";
-import { ERRORS, getErrorMessage } from "@/app/constants/errors";
+import { db } from '../../../firebase';
+import { useCollection } from 'react-firebase-hooks/firestore';
+import {
+  doc,
+  setDoc,
+  serverTimestamp,
+  collection,
+  orderBy,
+  query,
+  where,
+  getDocs,
+} from 'firebase/firestore';
+import { getServerSession } from 'next-auth';
+import { ERRORS, getErrorMessage } from '@/app/constants/errors';
+import { authOptions } from '../auth/[...nextauth]/route';
+import { LOGS } from '@/app/constants/logs';
+import { CreateYurboRequest, Yurbo } from '@/types/types';
+import { getYurbos } from '@/app/actions/getYurbos';
+
+export async function GET() {
+  try {
+    const yurbos = getYurbos();
+
+    return Response.json({ yurbos });
+  } catch (error) {
+    const errorMessage = getErrorMessage(error);
+
+    // failure
+    console.error(ERRORS.YURBO.GOT, JSON.stringify({ message: errorMessage }));
+    return Response.json(
+      { mesage: errorMessage, success: false },
+      { status: 500 }
+    );
+  }
+}
 
 export async function POST(request: CreateYurboRequest) {
   const body = await request.json();
@@ -22,7 +50,7 @@ export async function POST(request: CreateYurboRequest) {
       );
     }
 
-    const docRef = doc(collection(db, "users", session.user.email, "yurbos"));
+    const docRef = doc(collection(db, 'users', session.user.email, 'yurbos'));
 
     // add new personal yurbo
     await setDoc(docRef, {

@@ -16,7 +16,7 @@ interface Values {
 export default function Form() {
   const onSubmit = async (formikValues: Values) => {
     try {
-      const res = await fetch('/api/event/create', {
+      const res = await fetch('/api/event', {
         method: 'POST',
         body: JSON.stringify(formikValues),
       });
@@ -50,10 +50,10 @@ export default function Form() {
         <div className='flex flex-col w-full items-start my-5'>
           <label htmlFor={name}>{label} *</label>
           <input
-            className='text-black text-left w-1/4'
+            className='text-black text-left w-1/4 rounded-lg'
             id={name}
             type='text'
-            placeholder={`Enter ${label}`}
+            placeholder={` Enter ${label}`}
             {...formik.getFieldProps(name)}
           />
           <p

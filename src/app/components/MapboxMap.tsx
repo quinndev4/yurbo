@@ -20,19 +20,6 @@ export default function MapboxMap({ mapboxToken, yurbos }: MapboxMapProps) {
     height: '100%',
   });
 
-  const markers = yurbos.map((y) => ({
-    latitude: y.lat,
-    longitude: y.long,
-    name: y.location_id,
-  }));
-
-  const markers1 = [
-    { latitude: 37.7577, longitude: -122.4376, name: 'Marker 1' },
-    { latitude: 37.7749, longitude: -122.4194, name: 'Marker 2' },
-  ];
-
-  // const [yurbos, setYurbos] = useState<Yurbo[]>([]);
-
   useEffect(() => {
     navigator.geolocation.getCurrentPosition((position) => {
       setInitialViewport({
@@ -55,12 +42,8 @@ export default function MapboxMap({ mapboxToken, yurbos }: MapboxMapProps) {
             mapboxAccessToken={mapboxToken}
             initialViewState={initialViewport}
           >
-            {markers.map((m) => (
-              <Marker
-                key={'m_' + m.latitude.toString() + m.latitude.toString()}
-                longitude={m.longitude}
-                latitude={m.latitude}
-              ></Marker>
+            {yurbos.map((y) => (
+              <Marker key={y.id} longitude={y.long} latitude={y.lat}></Marker>
             ))}
           </ReactMapGl>
         )}

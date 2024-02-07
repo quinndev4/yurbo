@@ -27,7 +27,7 @@ export default function Form() {
   const onSubmit = async (formikValues: Values) => {
     try {
       console.log('formik vals', formikValues);
-      const res = await fetch('/api/yurbo/create', {
+      const res = await fetch('/api/yurbo', {
         method: 'POST',
         body: JSON.stringify(formikValues),
       });

@@ -27,18 +27,13 @@ export default async function Map() {
 
         <ul>
           {yurbos?.map((y: Yurbo) => (
-            <div
-              key={y.lat.toString() + y.long.toString()}
-              className='flex flex-row justify-between'
-            >
-              <li key={`loc-${y.location_id}`} className=''>
-                {y.location_id}
-              </li>
-              <li key={`coord${y.lat}`} className='pr-2'>
+            <div key={y.id} className='flex flex-row justify-between'>
+              <li className=''>{y.location_id}</li>
+              <li className='pr-2'>
                 {y.lat} x {y.long}
               </li>
               {y.created_at && (
-                <li key={y.location_id} className='pr-4'>
+                <li className='pr-4'>
                   {new Date(y.created_at.seconds * 1000).toLocaleDateString()}
                 </li>
               )}

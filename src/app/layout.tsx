@@ -23,8 +23,7 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body
-        className={`${inter.className} text-black bg-white dark:text-white dark:bg-black`}
-      >
+        className={`${inter.className} text-black bg-white dark:text-white dark:bg-black`}>
         <NextAuthProvider>
           <NavBar />
 

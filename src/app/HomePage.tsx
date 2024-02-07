@@ -19,6 +19,15 @@ export default function HomePage() {
       </Link>
 
       <Posts />
+      <Link
+        href={'/location/create'}
+        className='rounded-lg border-2 border-white'
+      >
+        Create a new Location
+      </Link>
+      <Link href={'/map'} className='rounded-lg border-2 border-white'>
+        Your Yurbos
+      </Link>
     </div>
   );
 }

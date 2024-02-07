@@ -15,55 +15,12 @@ import { ERRORS, getErrorMessage } from '@/app/constants/errors';
 import { authOptions } from '../auth/[...nextauth]/route';
 import { LOGS } from '@/app/constants/logs';
 import { CreateYurboRequest, Yurbo } from '@/types/types';
+import { getYurbos } from '@/app/actions/getYurbos';
 
 export async function GET() {
-  function isYurbo(y: any): y is Yurbo {
-    return (
-      y && 'lat' in y && 'long' in y && 'location' in y && 'created_at' in y
-    );
-  }
-
   try {
-    const session = await getServerSession(authOptions);
+    const yurbos = getYurbos();
 
-    // no user found in session
-    if (!session?.user?.email) {
-      return Response.json(
-        { success: false, mesage: ERRORS.UNATHORIZED },
-        { status: 401 }
-      );
-    }
-
-    // get yurbos for this user
-    const yurbo_snapshot = await getDocs(
-      query(
-        collection(db, 'users', session.user.email, 'yurbos')
-        // orderBy("timestamp", "desc")
-      )
-    );
-
-    let yurbos: Yurbo[] = [];
-
-    yurbo_snapshot.forEach((doc) => {
-      const y = doc.data();
-      if (y && isYurbo(y)) {
-        yurbos.push(y);
-      } else {
-        console.error('datum is not assignable to a yurbo...', y);
-      }
-    });
-
-    // const yurbos = yurbo_snapshot.map((doc) => doc.data());
-
-    // console.log(yurbos);
-    // yurbos.forEach((yurbo) => console.log(yurbo));
-
-    // const yurbos = yurbo_snapshot.docs.map((doc) => {
-    //   doc.data();
-    // });
-
-    // return successful response
-    console.log(LOGS.YURBO.GOT, 'for user', session.user.email, yurbos);
     return Response.json({ yurbos });
   } catch (error) {
     const errorMessage = getErrorMessage(error);

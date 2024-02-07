@@ -1,11 +1,9 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import ReactMapGl, { Marker } from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { getErrorMessage } from '../constants/errors';
 import { Yurbo } from '@/types/types';
-import Link from 'next/link';
 
 interface MapboxMapProps {
   mapboxToken: string;
@@ -25,7 +23,7 @@ export default function MapboxMap({ mapboxToken, yurbos }: MapboxMapProps) {
   const markers = yurbos.map((y) => ({
     latitude: y.lat,
     longitude: y.long,
-    name: y.location,
+    name: y.location_id,
   }));
 
   const markers1 = [
@@ -56,12 +54,14 @@ export default function MapboxMap({ mapboxToken, yurbos }: MapboxMapProps) {
           <ReactMapGl
             mapStyle='mapbox://styles/david-ham/clr6mfjmg010z01qu02xbhf0w'
             mapboxAccessToken={mapboxToken}
-            initialViewState={initialViewport}>
+            initialViewState={initialViewport}
+          >
             {markers.map((m) => (
               <Marker
                 key={'m_' + m.latitude.toString() + m.latitude.toString()}
                 longitude={m.longitude}
-                latitude={m.latitude}></Marker>
+                latitude={m.latitude}
+              ></Marker>
             ))}
           </ReactMapGl>
         )}

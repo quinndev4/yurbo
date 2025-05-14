@@ -10,9 +10,8 @@ import {
   where,
   getDocs,
 } from 'firebase/firestore';
-import { getServerSession } from 'next-auth';
+import { auth } from '@/auth';
 import { ERRORS, getErrorMessage } from '@/app/constants/errors';
-import { authOptions } from '../auth/[...nextauth]/route';
 import { LOGS } from '@/app/constants/logs';
 import { CreateYurboRequest, Yurbo } from '@/types/types';
 import { getYurbos } from '@/app/actions/getYurbos';
@@ -40,7 +39,7 @@ export async function POST(request: CreateYurboRequest) {
   const { location, lat, long } = body; // js destructuring
 
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
     // no user found in session
     if (!session?.user?.email) {

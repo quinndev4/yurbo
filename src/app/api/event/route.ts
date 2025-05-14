@@ -9,9 +9,8 @@ import {
   where,
   getDocs,
 } from 'firebase/firestore';
-import { getServerSession } from 'next-auth';
+import { auth } from '@/auth';
 import { ERRORS, getErrorMessage } from '@/app/constants/errors';
-import { authOptions } from '../auth/[...nextauth]/route';
 import { LOGS } from '@/app/constants/logs';
 import { Act, CreateEventRequest } from '@/types/types';
 
@@ -20,7 +19,7 @@ export async function GET() {
     return a && 'name' in a && 'created_at' in a;
   }
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
     // no user found in session
     if (!session?.user?.email) {
@@ -71,7 +70,7 @@ export async function POST(request: CreateEventRequest) {
   const { eventName } = body;
 
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
     // no user found in session
     if (!session?.user?.email) {

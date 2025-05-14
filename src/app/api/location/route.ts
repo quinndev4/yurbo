@@ -1,6 +1,5 @@
-import { getServerSession } from 'next-auth';
+import { auth } from '@/auth';
 import { CreateLocationRequest } from '@/types/types';
-import { authOptions } from '../auth/[...nextauth]/route';
 import { doc, setDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/firebase';
 import { LOGS } from '@/app/constants/logs';
@@ -12,7 +11,7 @@ export async function POST(request: CreateLocationRequest) {
   const { name, lat, long } = body; // js destructuring
 
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
     // no user found in session
     if (!session?.user?.email) {

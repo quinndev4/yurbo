@@ -14,7 +14,7 @@ export const authOptions: AuthOptions = {
   ],
   callbacks: {
     session: async ({ session, token, user }) => {
-      if (!session?.user?.email) return Promise.resolve(session);
+      if (!session?.user?.email) return session;
 
       const userDoc = await getDoc(doc(db, 'users', session?.user?.email));
 
@@ -32,7 +32,7 @@ export const authOptions: AuthOptions = {
 
       console.log(`Welcome ${session.user.name} (${session.user.email})!`);
 
-      return Promise.resolve(session);
+      return session;
     },
   },
 };

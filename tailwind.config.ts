@@ -15,6 +15,7 @@ const config: Config = {
       },
       screens: { '3xs': '256px', '2xs': '384px', xs: '512px', '3xl': '1792px' },
     },
+    colors: { primary: 'var(--color-primary-1)' },
   },
   plugins: [],
 };

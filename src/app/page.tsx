@@ -1,34 +1,12 @@
-'use client';
+import LinkButton from '@/components/LinkButton';
 
-import { useSession } from 'next-auth/react';
-import HomePage from './HomePage';
-import { RotatingLines } from 'react-loader-spinner';
-import SignInButton from './components/SignInButton';
-
-export default function Home() {
-  const { data: session, status } = useSession();
-
+export default function HomePage() {
   return (
-    <main className='flex min-h-screen flex-col items-center justify-between p-24'>
-      {session && status === 'authenticated' ? (
-        <HomePage />
-      ) : status === 'loading' ? (
-        <div className='m-auto'>
-          <RotatingLines
-            strokeColor='grey'
-            strokeWidth='5'
-            animationDuration='0.75'
-            width='96'
-            visible={true}
-          />
-        </div>
-      ) : (
-        <div className='flex flex-col'>
-          <h1 className='text-3xl font-bold mb-20'>Yurbo</h1>
-
-          <SignInButton />
-        </div>
-      )}
-    </main>
+    <div className='flex flex-col gap-8'>
+      <LinkButton href='/yurbo/create'>Create a new Yurbo</LinkButton>
+      <LinkButton href='/event/create'>Create a new Event</LinkButton>
+      <LinkButton href='/location/create'>Create a new Location</LinkButton>
+      <LinkButton href='/me/yurbos'>Your Yurbos</LinkButton>
+    </div>
   );
 }

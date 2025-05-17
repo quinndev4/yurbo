@@ -36,7 +36,7 @@ export async function GET() {
 export async function POST(request: CreateYurboRequest) {
   const body = await request.json();
 
-  const { location, lat, long } = body; // js destructuring
+  const { location_id, event_id, lat, long, description, name } = body; // js destructuring
 
   try {
     const session = await auth();
@@ -53,16 +53,17 @@ export async function POST(request: CreateYurboRequest) {
 
     // add new personal yurbo
     await setDoc(docRef, {
-      location,
-      lat,
-      long,
+      name,
+      event_id,
+      ...(location_id ? { location_id } : { lat, long }),
+      ...(description && { description }),
       created_at: serverTimestamp(),
     });
 
     // return successful response
-    console.log(LOGS.YURBO.CREATED, location, lat, long);
+    console.log(LOGS.YURBO.CREATED, location_id, body);
     return Response.json(
-      { message: LOGS.YURBO.CREATED, success: true, location, lat, long },
+      { message: LOGS.YURBO.CREATED, success: true, ...body },
       { status: 200 }
     );
   } catch (error) {
@@ -71,10 +72,10 @@ export async function POST(request: CreateYurboRequest) {
     // failure
     console.error(
       ERRORS.YURBO.CREATED,
-      JSON.stringify({ message: errorMessage, location, lat, long })
+      JSON.stringify({ message: errorMessage, body })
     );
     return Response.json(
-      { mesage: errorMessage, success: false, location, lat, long },
+      { mesage: errorMessage, success: false, ...body },
       { status: 500 }
     );
   }

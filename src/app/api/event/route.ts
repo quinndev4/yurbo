@@ -15,9 +15,6 @@ import { LOGS } from '@/app/constants/logs';
 import { Act, CreateEventRequest } from '@/types/types';
 
 export async function GET() {
-  function isAct(a: any): a is Act {
-    return a && 'name' in a && 'created_at' in a;
-  }
   try {
     const session = await auth();
 
@@ -31,27 +28,18 @@ export async function GET() {
 
     // get acts for this user
     const act_snapshot = await getDocs(
-      query(
-        collection(db, 'users', session.user.email, 'events')
-        // orderBy("timestamp", "desc")
-      )
+      query(collection(db, 'users', session.user.email, 'events'))
     );
 
-    // convert snapshot into list of Acts, making sure they are assignable to Act
-    let acts: Act[] = [];
+    const events = act_snapshot.docs.map((doc) => {
+      const data = doc.data();
 
-    act_snapshot.forEach((doc) => {
-      const a = doc.data();
-      if (isAct(a)) {
-        acts.push(a);
-      } else {
-        console.error('datum is not assignable to a yurbo...', a);
-      }
+      return { id: doc.id, ...data };
     });
 
     // return successful response
-    console.log(LOGS.YURBO.GOT, 'for user', session.user.email, acts);
-    return Response.json({ acts });
+    console.log(LOGS.EVENT.GOT, 'for user', session.user.email, events);
+    return Response.json({ events });
   } catch (error) {
     const errorMessage = getErrorMessage(error);
 
@@ -67,7 +55,7 @@ export async function GET() {
 export async function POST(request: CreateEventRequest) {
   const body = await request.json();
 
-  const { eventName } = body;
+  const { name, description } = body;
 
   try {
     const session = await auth();
@@ -84,14 +72,15 @@ export async function POST(request: CreateEventRequest) {
 
     // add new personal event
     await setDoc(docRef, {
-      name: eventName,
+      name,
+      ...(description && { description }),
       created_at: serverTimestamp(),
     });
 
     // return successful response
-    console.log(LOGS.EVENT.CREATED, eventName);
+    console.log(LOGS.EVENT.CREATED, name);
     return Response.json(
-      { message: LOGS.EVENT.CREATED, success: true, eventName },
+      { message: LOGS.EVENT.CREATED, success: true, name, description },
       { status: 200 }
     );
   } catch (error) {
@@ -100,10 +89,10 @@ export async function POST(request: CreateEventRequest) {
     // failure
     console.error(
       ERRORS.EVENT.CREATED,
-      JSON.stringify({ message: errorMessage, eventName })
+      JSON.stringify({ message: errorMessage, name, description })
     );
     return Response.json(
-      { mesage: errorMessage, success: false, eventName },
+      { mesage: errorMessage, success: false, name, description },
       { status: 500 }
     );
   }

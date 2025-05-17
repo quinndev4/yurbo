@@ -1,4 +1,4 @@
-import { getYurbos } from '../actions/getYurbos';
+import { getYurbos } from '../../actions/getYurbos';
 
 export default async function Map() {
   const yurbos = await getYurbos();

@@ -14,12 +14,6 @@ declare interface GenericFormFieldComponent<T> extends T {
   error: string | undefined;
 }
 
-declare interface GenericFormField<T> {
-  yup: Yup.Object;
-  initialValue: T;
-  Component: React.ComponentType<GenericFormFieldComponent<T>>;
-}
-
 declare interface GenericFormProps<> {
   fields: GenericFormField[];
   onSubmit: FormEventHandler<HTMLFormElement>;
@@ -40,7 +34,12 @@ declare interface CreateEventError extends GenericError {
 
 /* Create Yurbo Types  */
 declare interface CreateYurboRequest extends NextRequest {
-  body: { location: string; lat: number; long: number };
+  body: {
+    location_id?: string;
+    lat: number;
+    long: number;
+    description?: string;
+  };
 }
 
 declare interface CreateYurboResponse extends GenericResponse {
@@ -94,32 +93,3 @@ declare interface CreateLocationResponse extends GenericResponse {
 declare interface CreateLocationError extends GenericError {
   name: string;
 }
-
-// // Class for markers
-// declare interface Marks {
-//   name: string;
-//   lat: number;
-//   long: number;
-// }
-
-/*
-
-declare interface GenericFormFieldComponent
-  extends HTMLProps<HTMLInputElement> {
-  id: string;
-  label: string;
-  error: string | undefined;
-}
-
-declare interface GenericFormField<T> {
-  yup: Yup.Object;
-  Component: React.ComponentType<GenericFormFieldComponent>;
-}
-
-declare interface GenericFormProps<> {
-  fields: GenericFormField[];
-  onSubmit: FormEventHandler<HTMLFormElement>;
-}
-
-
-*/

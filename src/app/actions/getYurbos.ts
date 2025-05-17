@@ -1,7 +1,6 @@
 'use server';
 
-import { getServerSession } from 'next-auth';
-import { authOptions } from '../api/auth/[...nextauth]/route';
+import { auth } from '@/auth';
 import { ERRORS, getErrorMessage } from '../constants/errors';
 import { collection, getDocs, query } from 'firebase/firestore';
 import { db } from '@/firebase';
@@ -10,7 +9,7 @@ import { Yurbo } from '@/types/types';
 
 export async function getYurbos(): Promise<Yurbo[]> {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
     // no user found in session
     if (!session?.user?.email) {

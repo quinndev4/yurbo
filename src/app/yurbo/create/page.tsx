@@ -54,7 +54,7 @@ export default function CreateYurboPage() {
       .then((data) => {
         setLocationOptions(
           data.locations.map((loc: any) => ({
-            label: loc.name,
+            label: `${loc.name} - ${loc.description}`,
             value: loc.id,
           }))
         );
@@ -65,7 +65,7 @@ export default function CreateYurboPage() {
       .then((data) => {
         setEventOptions(
           data.events.map((event: any) => ({
-            label: event.name,
+            label: `${event.name} - ${event.description}`,
             value: event.id,
           }))
         );

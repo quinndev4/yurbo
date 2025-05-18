@@ -5,7 +5,7 @@ import {
   FieldValues,
   DefaultValues,
 } from 'react-hook-form';
-import { z, ZodType } from 'zod';
+import { ZodType } from 'zod';
 import Button from './Button';
 import { useEffect } from 'react';
 
@@ -84,9 +84,11 @@ export default function FormBuilder<T extends FieldValues>({
         </div>
       ))}
 
-      <Button type='submit' disabled={submitting}>
-        Submit
-      </Button>
+      <div className='mt-8 flex justify-end'>
+        <Button type='submit' disabled={submitting}>
+          Submit
+        </Button>
+      </div>
     </form>
   );
 }

@@ -12,7 +12,8 @@ import {
 import { auth } from '@/auth';
 import { ERRORS, getErrorMessage } from '@/app/constants/errors';
 import { LOGS } from '@/app/constants/logs';
-import { Act, CreateEventRequest } from '@/types/types';
+import { Event, CreateEventRequest } from '@/types/types';
+import { NextRequest } from 'next/server';
 
 export async function GET() {
   try {
@@ -52,7 +53,7 @@ export async function GET() {
   }
 }
 
-export async function POST(request: CreateEventRequest) {
+export async function POST(request: NextRequest) {
   const body = await request.json();
 
   const { name, description } = body;

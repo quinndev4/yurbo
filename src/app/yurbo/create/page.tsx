@@ -5,17 +5,11 @@ import FormBuilder, { Field } from '@/components/FormBuilder';
 import FormLayout from '@/components/FormLayout';
 import { useEffect, useState } from 'react';
 import { CreateYurboResponse } from '@/types/types';
-import { useRouter } from 'next/navigation';
 import { getErrorMessgaeSuccess } from '@/app/constants/errors';
+import { useUserData } from '@/components/UserDataProvider';
 
 export default function CreateYurboPage() {
-  const router = useRouter();
-  const [locationOptions, setLocationOptions] = useState<
-    { label: string; value: string }[]
-  >([]);
-  const [eventOptions, setEventOptions] = useState<
-    { label: string; value: string }[]
-  >([]);
+  const { events, locations, setYurbos } = useUserData();
 
   const fields: Field[] = [
     { name: 'name', label: 'Name', type: 'text' },
@@ -24,13 +18,19 @@ export default function CreateYurboPage() {
       name: 'event_id',
       label: 'Event',
       type: 'select',
-      options: eventOptions,
+      options: events.map((event) => ({
+        label: `${event.name} - ${event.description}`,
+        value: event.id,
+      })),
     },
     {
       name: 'location_id',
       label: 'Location',
       type: 'select',
-      options: locationOptions,
+      options: locations.map((loc: any) => ({
+        label: `${loc.name} - ${loc.description}`,
+        value: loc.id,
+      })),
     },
     { name: 'lat', label: 'Latitude', type: 'text' },
     { name: 'long', label: 'Longitude', type: 'text' },
@@ -48,34 +48,13 @@ export default function CreateYurboPage() {
         long: position.coords.longitude,
       });
     });
-
-    fetch('/api/location')
-      .then((res) => res.json())
-      .then((data) => {
-        setLocationOptions(
-          data.locations.map((loc: any) => ({
-            label: `${loc.name} - ${loc.description}`,
-            value: loc.id,
-          }))
-        );
-      });
-
-    fetch('/api/event')
-      .then((res) => res.json())
-      .then((data) => {
-        setEventOptions(
-          data.events.map((event: any) => ({
-            label: `${event.name} - ${event.description}`,
-            value: event.id,
-          }))
-        );
-      });
   }, []);
 
   const onSubmit = async (yurbo: YurboFormData) => {
     console.log('Yurbo submitting...', yurbo);
 
     setSubmitting(true);
+    setSubmitting((a) => a);
 
     try {
       const res = await fetch('/api/yurbo', {
@@ -87,7 +66,7 @@ export default function CreateYurboPage() {
 
       alert(JSON.stringify(data, null, 2));
 
-      router.push('/');
+      setYurbos((oldYurbos) => [data.yurbo, ...oldYurbos]);
     } catch (error) {
       alert(
         JSON.stringify({ ...yurbo, ...getErrorMessgaeSuccess(error) }, null, 2)

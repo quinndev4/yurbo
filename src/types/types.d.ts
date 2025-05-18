@@ -1,6 +1,10 @@
 import { Timestamp } from 'firebase/firestore';
 import { NextRequest, NextResponse } from 'next/server';
 
+type Never<T> = {
+  [K in keyof T]?: never;
+};
+
 interface GenericResponse {
   success: boolean;
   message: string;
@@ -43,7 +47,7 @@ declare interface CreateYurboRequest extends NextRequest {
 }
 
 declare interface CreateYurboResponse extends GenericResponse {
-  location: string;
+  yurbo: Yurbo;
 }
 
 declare interface CreateYurboError extends GenericError {
@@ -59,27 +63,28 @@ declare interface GetYurbosError extends GenericError {
   yurbos: Yurbo[];
 }
 
-/* Class for a Yurbo */
-declare interface Yurbo {
-  act_id?: Act;
-  created_at: Timestamp;
-  location_id: string;
+declare interface DBObject {
+  id: string;
   name: string;
+  description?: string;
+  created_at: Timestamp;
+}
+
+interface Coordinates {
   lat: number;
   long: number;
 }
+
+/* Class for a Yurbo */
+type Yurbo = DBObject & { event_id: string } & (
+    | ({ location_id: string } & Never<Coordinates>)
+    | (Coordinates & { location_id?: never })
+  );
 
 /* Class for Event/Activity */
-declare interface Act {
-  name: string;
-  created_at: Timestamp;
-}
+declare interface Event extends DBObject {}
 
-declare interface Location {
-  name: string;
-  lat: number;
-  long: number;
-}
+declare interface Location extends DBObject, Coordinates {}
 
 /* Create Location Types  */
 declare interface CreateLocationRequest extends NextRequest {

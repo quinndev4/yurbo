@@ -2,7 +2,7 @@
 
 import { auth } from '@/auth';
 import { ERRORS, getErrorMessage } from '../constants/errors';
-import { collection, getDocs, query } from 'firebase/firestore';
+import { collection, getDocs, query, Timestamp } from 'firebase/firestore';
 import { db } from '@/firebase';
 import { LOGS } from '../constants/logs';
 import { Yurbo } from '@/types/types';
@@ -25,19 +25,11 @@ export async function getYurbos(): Promise<Yurbo[]> {
     );
 
     const yurbos = yurbo_snapshot.docs.map((doc) => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        created_at: data.created_at,
-        location_id: data.location_id,
-        name: data.name,
-        lat: data.lat,
-        long: data.long,
-      };
+      return { id: doc.id, ...doc.data() } as Yurbo;
     });
 
     // return successful response
-    console.log(LOGS.YURBO.GOT, session.user.email, yurbos);
+    console.log(LOGS.YURBO.GOT, session.user.email, yurbos, Date.now());
 
     return yurbos;
   } catch (error) {

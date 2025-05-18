@@ -15,10 +15,12 @@ import { ERRORS, getErrorMessage } from '@/app/constants/errors';
 import { LOGS } from '@/app/constants/logs';
 import { CreateYurboRequest, Yurbo } from '@/types/types';
 import { getYurbos } from '@/app/actions/getYurbos';
+import { revalidatePath } from 'next/cache';
+import { NextRequest } from 'next/server';
 
 export async function GET() {
   try {
-    const yurbos = getYurbos();
+    const yurbos = await getYurbos();
 
     return Response.json({ yurbos });
   } catch (error) {
@@ -33,7 +35,7 @@ export async function GET() {
   }
 }
 
-export async function POST(request: CreateYurboRequest) {
+export async function POST(request: NextRequest) {
   const body = await request.json();
 
   const { location_id, event_id, lat, long, description, name } = body; // js destructuring
@@ -60,10 +62,12 @@ export async function POST(request: CreateYurboRequest) {
       created_at: serverTimestamp(),
     });
 
+    revalidatePath('/api/yurbo');
+
     // return successful response
     console.log(LOGS.YURBO.CREATED, location_id, body);
     return Response.json(
-      { message: LOGS.YURBO.CREATED, success: true, ...body },
+      { message: LOGS.YURBO.CREATED, success: true, yurbo: body },
       { status: 200 }
     );
   } catch (error) {

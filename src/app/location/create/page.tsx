@@ -5,7 +5,7 @@ import FormBuilder, { Field } from '@/components/FormBuilder';
 import FormLayout from '@/components/FormLayout';
 import { useEffect, useState } from 'react';
 import { CreateLocationResponse } from '@/types/types';
-import { getErrorMessgaeSuccess } from '@/app/constants/errors';
+import { getErrorMessgaeSuccess } from '@/constants/errors';
 import { useRouter } from 'next/navigation';
 
 export default function CreateLocationPage() {

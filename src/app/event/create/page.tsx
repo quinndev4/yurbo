@@ -6,7 +6,7 @@ import FormLayout from '@/components/FormLayout';
 import { useState } from 'react';
 import { CreateEventResponse } from '@/types/types';
 import { useRouter } from 'next/navigation';
-import { getErrorMessgaeSuccess } from '@/app/constants/errors';
+import { getErrorMessgaeSuccess } from '@/constants/errors';
 
 export default function CreateEventPage() {
   const router = useRouter();

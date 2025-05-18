@@ -8,24 +8,31 @@ import {
   getDocs,
   query,
 } from 'firebase/firestore';
-import { db } from '@/firebase';
-import { LOGS } from '@/app/constants/logs';
-import { ERRORS, getErrorMessage } from '@/app/constants/errors';
+import { firestore } from '@/firebase';
+import { LOGS } from '@/constants/logs';
+import { ERRORS, getErrorMessage } from '@/constants/errors';
 import { NextRequest } from 'next/server';
+import { revalidatePath } from 'next/cache';
+import { C } from '@/constants/constants';
 
 export async function GET() {
   try {
     const session = await auth();
 
     // no user found in session
-    if (!session?.user?.email) {
+    if (!session?.user?.id) {
       throw new Error(ERRORS.UNATHORIZED);
     }
 
     // get locations for this user
     const personal_locations = await getDocs(
       query(
-        collection(db, 'users', session.user.email, 'locations')
+        collection(
+          firestore,
+          C.COLLECTIONS.USERS,
+          session.user.id,
+          C.COLLECTIONS.LOCATIONS
+        )
         // orderBy("timestamp", "desc")
       )
     );
@@ -60,7 +67,7 @@ export async function POST(request: NextRequest) {
     const session = await auth();
 
     // no user found in session
-    if (!session?.user?.email) {
+    if (!session?.user?.id) {
       return Response.json(
         { success: false, message: ERRORS.UNATHORIZED },
         { status: 401 }
@@ -69,7 +76,14 @@ export async function POST(request: NextRequest) {
 
     // add new personal yurbo
     await setDoc(
-      doc(collection(db, 'users', session.user.email, 'locations')),
+      doc(
+        collection(
+          firestore,
+          C.COLLECTIONS.USERS,
+          session.user.id,
+          C.COLLECTIONS.LOCATIONS
+        )
+      ),
       {
         name,
         ...(description && { description }),
@@ -79,10 +93,12 @@ export async function POST(request: NextRequest) {
       }
     );
 
+    revalidatePath(C.ROUTES.locations(session.user.id));
+
     // return successful response
     console.log(LOGS.LOCATION.CREATED, body);
     return Response.json(
-      { message: LOGS.LOCATION.CREATED, success: true, ...body },
+      { message: LOGS.LOCATION.CREATED, success: true, location: body },
       { status: 200 }
     );
   } catch (error) {

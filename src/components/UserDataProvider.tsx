@@ -1,6 +1,8 @@
 'use client';
 
+import { C } from '@/constants/constants';
 import { Event, Location, Yurbo } from '@/types/types';
+import { useSession } from 'next-auth/react';
 import { createContext, useContext, useEffect, useState } from 'react';
 
 interface UserDataContext {
@@ -26,36 +28,44 @@ export default function UserDataProvider({
 }: {
   children: React.ReactNode;
 }) {
+  const { data: session } = useSession();
   const [yurbos, setYurbos] = useState<Yurbo[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
 
   useEffect(() => {
-    const fetchUserData = async () => {
+    (async () => {
       try {
-        const [yurbos, events, locations] = await Promise.all([
-          fetch('/api/yurbo', { cache: 'force-cache' })
-            .then((res) => res.json())
-            .then((res) => res.yurbos),
-          fetch('/api/event', { cache: 'force-cache' })
-            .then((res) => res.json())
-            .then((res) => res.events),
-          fetch('/api/location', { cache: 'force-cache' })
-            .then((res) => res.json())
-            .then((res) => res.locations),
-        ]);
+        if (session?.user?.id) {
+          const [yurbos, events, locations] = await Promise.all([
+            fetch(C.ROUTES.yurbos(session.user.id), {
+              cache: 'force-cache',
+            })
+              .then((res) => res.json())
+              .then((res) => res.yurbos),
+            fetch(C.ROUTES.events(session.user.id), {
+              cache: 'force-cache',
+            })
+              .then((res) => res.json())
+              .then((res) => res.events),
+            fetch(C.ROUTES.locations(session.user.id), {
+              cache: 'force-cache',
+            })
+              .then((res) => res.json())
+              .then((res) => res.locations),
+          ]);
 
-        console.log('user data', { yurbos, events, locations });
+          console.log('user data', { yurbos, events, locations });
 
-        setYurbos(yurbos);
-        setEvents(events);
-        setLocations(locations);
+          setYurbos(yurbos);
+          setEvents(events);
+          setLocations(locations);
+        }
       } catch (error) {
         console.error('Failed to fetch user data', error);
       }
-    };
-    fetchUserData();
-  }, []);
+    })();
+  }, [session?.user?.id]);
 
   return (
     <UserDataContext.Provider

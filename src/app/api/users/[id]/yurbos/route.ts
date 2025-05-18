@@ -1,22 +1,12 @@
-import { db } from '../../../firebase';
-import { useCollection } from 'react-firebase-hooks/firestore';
-import {
-  doc,
-  setDoc,
-  serverTimestamp,
-  collection,
-  orderBy,
-  query,
-  where,
-  getDocs,
-} from 'firebase/firestore';
+import { firestore } from '@/firebase';
+import { doc, setDoc, serverTimestamp, collection } from 'firebase/firestore';
 import { auth } from '@/auth';
-import { ERRORS, getErrorMessage } from '@/app/constants/errors';
-import { LOGS } from '@/app/constants/logs';
-import { CreateYurboRequest, Yurbo } from '@/types/types';
+import { ERRORS, getErrorMessage } from '@/constants/errors';
+import { LOGS } from '@/constants/logs';
 import { getYurbos } from '@/app/actions/getYurbos';
 import { revalidatePath } from 'next/cache';
 import { NextRequest } from 'next/server';
+import { C } from '@/constants/constants';
 
 export async function GET() {
   try {
@@ -44,25 +34,33 @@ export async function POST(request: NextRequest) {
     const session = await auth();
 
     // no user found in session
-    if (!session?.user?.email) {
+    if (!session?.user?.id) {
       return Response.json(
         { success: false, mesage: ERRORS.UNATHORIZED },
         { status: 401 }
       );
     }
 
-    const docRef = doc(collection(db, 'users', session.user.email, 'yurbos'));
-
     // add new personal yurbo
-    await setDoc(docRef, {
-      name,
-      event_id,
-      ...(location_id ? { location_id } : { lat, long }),
-      ...(description && { description }),
-      created_at: serverTimestamp(),
-    });
+    await setDoc(
+      doc(
+        collection(
+          firestore,
+          C.COLLECTIONS.USERS,
+          session.user.id,
+          C.COLLECTIONS.YURBOS
+        )
+      ),
+      {
+        name,
+        event_id,
+        ...(location_id ? { location_id } : { lat, long }),
+        ...(description && { description }),
+        created_at: serverTimestamp(),
+      }
+    );
 
-    revalidatePath('/api/yurbo');
+    revalidatePath(C.ROUTES.yurbos(session.user.id));
 
     // return successful response
     console.log(LOGS.YURBO.CREATED, location_id, body);

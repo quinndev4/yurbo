@@ -1,26 +1,32 @@
 'use server';
 
 import { auth } from '@/auth';
-import { ERRORS, getErrorMessage } from '../constants/errors';
-import { collection, getDocs, query, Timestamp } from 'firebase/firestore';
-import { db } from '@/firebase';
-import { LOGS } from '../constants/logs';
+import { ERRORS, getErrorMessage } from '@/constants/errors';
+import { collection, getDocs, orderBy, query } from 'firebase/firestore';
+import { firestore } from '@/firebase';
+import { LOGS } from '@/constants/logs';
 import { Yurbo } from '@/types/types';
+import { C } from '@/constants/constants';
 
 export async function getYurbos(): Promise<Yurbo[]> {
   try {
     const session = await auth();
 
     // no user found in session
-    if (!session?.user?.email) {
+    if (!session?.user?.id) {
       throw new Error(ERRORS.UNATHORIZED);
     }
 
     // get yurbos for this user
     const yurbo_snapshot = await getDocs(
       query(
-        collection(db, 'users', session.user.email, 'yurbos')
-        // orderBy("timestamp", "desc")
+        collection(
+          firestore,
+          C.COLLECTIONS.USERS,
+          session.user.id,
+          C.COLLECTIONS.YURBOS
+        )
+        // orderBy('created_at', 'desc')
       )
     );
 

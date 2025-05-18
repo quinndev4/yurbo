@@ -5,10 +5,14 @@ import FormBuilder, { Field } from '@/components/FormBuilder';
 import FormLayout from '@/components/FormLayout';
 import { useEffect, useState } from 'react';
 import { CreateYurboResponse } from '@/types/types';
-import { getErrorMessgaeSuccess } from '@/app/constants/errors';
+import { getErrorMessgaeSuccess } from '@/constants/errors';
 import { useUserData } from '@/components/UserDataProvider';
+import { useSession } from 'next-auth/react';
+import { C } from '@/constants/constants';
 
 export default function CreateYurboPage() {
+  const { data: session } = useSession();
+
   const { events, locations, setYurbos } = useUserData();
 
   const fields: Field[] = [
@@ -54,10 +58,9 @@ export default function CreateYurboPage() {
     console.log('Yurbo submitting...', yurbo);
 
     setSubmitting(true);
-    setSubmitting((a) => a);
 
     try {
-      const res = await fetch('/api/yurbo', {
+      const res = await fetch(C.ROUTES.events(session?.user?.id), {
         method: 'POST',
         body: JSON.stringify(yurbo),
       });

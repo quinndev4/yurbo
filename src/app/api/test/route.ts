@@ -1,4 +1,4 @@
-import { db } from '../../../firebase';
+import { firestore } from '@/firebase';
 import {
   doc,
   getDocs,
@@ -12,6 +12,7 @@ import { ERRORS, getErrorMessage } from '@/constants/errors';
 import { LOGS } from '@/constants/logs';
 import { revalidatePath } from 'next/cache';
 import { NextRequest } from 'next/server';
+import { C } from '@/constants/constants';
 
 export async function GET() {
   try {
@@ -31,7 +32,12 @@ export async function GET() {
     // get locations for this user
     const personal_locations = await getDocs(
       query(
-        collection(db, 'users', session.user.id, 'locations')
+        collection(
+          firestore,
+          C.COLLECTIONS.USERS,
+          session.user.id,
+          C.COLLECTIONS.TEST
+        )
         // orderBy("timestamp", "desc")
       )
     );
@@ -73,10 +79,20 @@ export async function POST(request: NextRequest) {
     }
 
     // add new personal yurbo
-    await setDoc(doc(collection(db, 'users', session.user.id, 'yurbos')), {
-      field1,
-      field2,
-    });
+    await setDoc(
+      doc(
+        collection(
+          firestore,
+          C.COLLECTIONS.USERS,
+          session.user.id,
+          C.COLLECTIONS.YURBOS
+        )
+      ),
+      {
+        field1,
+        field2,
+      }
+    );
 
     revalidatePath('/api/test');
 

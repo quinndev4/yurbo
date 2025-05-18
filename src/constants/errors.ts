@@ -10,6 +10,10 @@ export const ERRORS = {
     CREATED: 'Location failed to create',
     GOT: 'Locations failed to be retrieved',
   },
+  TEST: {
+    GET: '',
+    POST: '',
+  },
   UNATHORIZED: 'User not authorized',
   UNKNOWN: 'An unknown error occurred',
 };

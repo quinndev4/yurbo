@@ -3,10 +3,11 @@ import type { Metadata } from 'next';
 import { SessionProvider } from 'next-auth/react';
 
 import { Inter } from 'next/font/google';
-import './globals.css';
 import NavBar from '@/components/NavBar';
 import LoginPage from './LoginPage';
 import UserDataProvider from '@/components/UserDataProvider';
+
+import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -18,7 +19,6 @@ export const metadata: Metadata = {
   description: '',
 };
 
-// TODO: have navbar show up only when signed in. can make a separate client componenet for this
 export default async function RootLayout({
   children,
 }: {
@@ -28,18 +28,16 @@ export default async function RootLayout({
 
   return (
     <SessionProvider>
-      <html lang='en'>
+      <html lang='en' className='h-full'>
         <body
-          className={`${inter.className} bg-primary-light text-primary-dark dark:bg-primary-dark dark:text-primary-light`}
+          className={`${inter.className} bg-primary-light text-primary-dark dark:bg-primary-dark dark:text-primary-light flex h-full min-h-screen flex-col`}
         >
           {session?.user ? (
             <UserDataProvider>
-              <div className='flex min-h-screen flex-col'>
-                <NavBar />
-                <main className='mt-22 flex justify-center overflow-y-auto p-8'>
-                  {children}
-                </main>
-              </div>
+              <NavBar />
+              <main className='flex flex-grow justify-center pt-20'>
+                {children}
+              </main>
             </UserDataProvider>
           ) : (
             <div className='flex min-h-screen flex-col items-center justify-center gap-10'>

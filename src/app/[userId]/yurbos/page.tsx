@@ -1,9 +1,5 @@
-import { getYurbos } from '../../actions/getYurbos';
+import TestMapBasic from '@/components/TestMap';
 
-export default async function Map() {
-  const yurbos = await getYurbos();
-
-  console.log('Yurboooos', yurbos);
-
-  return <div>Map</div>;
+export default function UserYurbosPage() {
+  return <TestMapBasic />;
 }

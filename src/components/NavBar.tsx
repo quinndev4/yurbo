@@ -4,7 +4,7 @@ import SignOutButton from './SignOutButton';
 
 export default async function NavBar() {
   return (
-    <header className='fixed top-0 flex h-20 w-full items-center justify-between border-b-2 bg-black'>
+    <header className='fixed top-0 z-50 flex h-20 w-full items-center justify-between border-b-2 bg-black'>
       {/* Home logo */}
       <Link className='mx-4 text-3xl font-bold hover:cursor-pointer' href='/'>
         Yurbo

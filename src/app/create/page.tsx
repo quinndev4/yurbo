@@ -31,7 +31,7 @@ export default function CreateYurboPage() {
       name: 'location_id',
       label: 'Location',
       type: 'select',
-      options: locations.map((loc: any) => ({
+      options: locations.map((loc) => ({
         label: `${loc.name} - ${loc.description}`,
         value: loc.id,
       })),

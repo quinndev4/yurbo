@@ -91,6 +91,7 @@ export async function POST(request: NextRequest) {
       {
         field1,
         field2,
+        created_at: serverTimestamp(),
       }
     );
 

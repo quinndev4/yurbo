@@ -1,12 +1,10 @@
 import { auth } from '@/auth';
-import { CreateLocationRequest } from '@/types/types';
 import {
-  doc,
-  setDoc,
   collection,
   serverTimestamp,
   getDocs,
   query,
+  addDoc,
 } from 'firebase/firestore';
 import { firestore } from '@/firebase';
 import { LOGS } from '@/constants/logs';
@@ -75,14 +73,12 @@ export async function POST(request: NextRequest) {
     }
 
     // add new personal yurbo
-    await setDoc(
-      doc(
-        collection(
-          firestore,
-          C.COLLECTIONS.USERS,
-          session.user.id,
-          C.COLLECTIONS.LOCATIONS
-        )
+    const res = await addDoc(
+      collection(
+        firestore,
+        C.COLLECTIONS.USERS,
+        session.user.id,
+        C.COLLECTIONS.LOCATIONS
       ),
       {
         name,
@@ -98,7 +94,11 @@ export async function POST(request: NextRequest) {
     // return successful response
     console.log(LOGS.LOCATION.CREATED, body);
     return Response.json(
-      { message: LOGS.LOCATION.CREATED, success: true, location: body },
+      {
+        message: LOGS.LOCATION.CREATED,
+        success: true,
+        location: { ...body, id: res.id },
+      },
       { status: 200 }
     );
   } catch (error) {

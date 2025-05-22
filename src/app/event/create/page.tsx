@@ -9,11 +9,14 @@ import { useRouter } from 'next/navigation';
 import { getErrorMessgaeSuccess } from '@/constants/errors';
 import { C } from '@/constants/constants';
 import { useSession } from 'next-auth/react';
+import { useUserData } from '@/components/UserDataProvider';
 
 export default function CreateEventPage() {
   const { data: session } = useSession();
 
   const router = useRouter();
+
+  const { setEvents } = useUserData();
 
   const fields: Field[] = [
     { name: 'name', label: 'Name', type: 'text' },
@@ -36,6 +39,8 @@ export default function CreateEventPage() {
       const data: CreateEventResponse = await res.json();
 
       alert(JSON.stringify(data, null, 2));
+
+      setEvents((oldEvents) => [data.event, ...oldEvents]);
 
       router.push('/');
     } catch (error) {

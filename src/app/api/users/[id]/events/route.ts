@@ -1,11 +1,10 @@
 import { firestore } from '@/firebase';
 import {
-  doc,
-  setDoc,
   serverTimestamp,
   collection,
   query,
   getDocs,
+  addDoc,
 } from 'firebase/firestore';
 import { auth } from '@/auth';
 import { ERRORS, getErrorMessage } from '@/constants/errors';
@@ -79,28 +78,31 @@ export async function POST(
       );
     }
 
-    const docRef = doc(
+    // add new personal event
+    const res = await addDoc(
       collection(
         firestore,
         C.COLLECTIONS.USERS,
         session.user.id,
         C.COLLECTIONS.EVENTS
-      )
+      ),
+      {
+        name,
+        ...(description && { description }),
+        created_at: serverTimestamp(),
+      }
     );
-
-    // add new personal event
-    await setDoc(docRef, {
-      name,
-      ...(description && { description }),
-      created_at: serverTimestamp(),
-    });
 
     revalidatePath(C.ROUTES.events(session.user.id));
 
     // return successful response
     console.log(LOGS.EVENT.CREATED, name);
     return Response.json(
-      { message: LOGS.EVENT.CREATED, success: true, name, description },
+      {
+        message: LOGS.EVENT.CREATED,
+        success: true,
+        event: { ...body, id: res.id },
+      },
       { status: 200 }
     );
   } catch (error) {

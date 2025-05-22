@@ -1,5 +1,5 @@
 import { firestore } from '@/firebase';
-import { doc, setDoc, serverTimestamp, collection } from 'firebase/firestore';
+import { serverTimestamp, collection, addDoc } from 'firebase/firestore';
 import { auth } from '@/auth';
 import { ERRORS, getErrorMessage } from '@/constants/errors';
 import { LOGS } from '@/constants/logs';
@@ -42,14 +42,12 @@ export async function POST(request: NextRequest) {
     }
 
     // add new personal yurbo
-    await setDoc(
-      doc(
-        collection(
-          firestore,
-          C.COLLECTIONS.USERS,
-          session.user.id,
-          C.COLLECTIONS.YURBOS
-        )
+    const res = await addDoc(
+      collection(
+        firestore,
+        C.COLLECTIONS.USERS,
+        session.user.id,
+        C.COLLECTIONS.YURBOS
       ),
       {
         name,
@@ -65,7 +63,11 @@ export async function POST(request: NextRequest) {
     // return successful response
     console.log(LOGS.YURBO.CREATED, location_id, body);
     return Response.json(
-      { message: LOGS.YURBO.CREATED, success: true, yurbo: body },
+      {
+        message: LOGS.YURBO.CREATED,
+        success: true,
+        yurbo: { ...body, id: res.id },
+      },
       { status: 200 }
     );
   } catch (error) {

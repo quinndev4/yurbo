@@ -1,5 +1,5 @@
 import { Timestamp } from 'firebase/firestore';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 
 type Never<T> = {
   [K in keyof T]?: never;
@@ -29,11 +29,11 @@ declare interface CreateEventRequest extends NextRequest {
 }
 
 declare interface CreateEventResponse extends GenericResponse {
-  eventName: string;
+  event: Event;
 }
 
 declare interface CreateEventError extends GenericError {
-  eventName: string;
+  event: Event;
 }
 
 /* Create Yurbo Types  */
@@ -82,6 +82,7 @@ type Yurbo = DBObject & { event_id: string } & (
   );
 
 /* Class for Event/Activity */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 declare interface Event extends DBObject {}
 
 declare interface Location extends DBObject, Coordinates {}
@@ -92,7 +93,7 @@ declare interface CreateLocationRequest extends NextRequest {
 }
 
 declare interface CreateLocationResponse extends GenericResponse {
-  name: string;
+  location: Location;
 }
 
 declare interface CreateLocationError extends GenericError {

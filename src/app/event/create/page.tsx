@@ -7,8 +7,12 @@ import { useState } from 'react';
 import { CreateEventResponse } from '@/types/types';
 import { useRouter } from 'next/navigation';
 import { getErrorMessgaeSuccess } from '@/constants/errors';
+import { C } from '@/constants/constants';
+import { useSession } from 'next-auth/react';
 
 export default function CreateEventPage() {
+  const { data: session } = useSession();
+
   const router = useRouter();
 
   const fields: Field[] = [
@@ -24,7 +28,7 @@ export default function CreateEventPage() {
     setSubmitting(true);
 
     try {
-      const res = await fetch('/api/event', {
+      const res = await fetch(C.ROUTES.events(session?.user?.id), {
         method: 'POST',
         body: JSON.stringify(location),
       });

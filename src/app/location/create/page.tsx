@@ -7,8 +7,12 @@ import { useEffect, useState } from 'react';
 import { CreateLocationResponse } from '@/types/types';
 import { getErrorMessgaeSuccess } from '@/constants/errors';
 import { useRouter } from 'next/navigation';
+import { C } from '@/constants/constants';
+import { useSession } from 'next-auth/react';
 
 export default function CreateLocationPage() {
+  const { data: session } = useSession();
+
   const router = useRouter();
 
   const fields: Field[] = [
@@ -38,7 +42,7 @@ export default function CreateLocationPage() {
     setSubmitting(true);
 
     try {
-      const res = await fetch('/api/location', {
+      const res = await fetch(C.ROUTES.locations(session?.user?.id), {
         method: 'POST',
         body: JSON.stringify(location),
       });

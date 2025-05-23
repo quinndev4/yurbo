@@ -36,6 +36,19 @@ declare interface CreateEventError extends GenericError {
   event: Event;
 }
 
+// Create frien
+declare interface CreateFriendRequest extends NextRequest {
+  body: { friendName: string };
+}
+
+declare interface CreateFriendResponse extends GenericResponse {
+  friend: Friend;
+}
+
+declare interface CreateFriendError extends GenericError {
+  friend: Friend;
+}
+
 /* Create Yurbo Types  */
 declare interface CreateYurboRequest extends NextRequest {
   body: {
@@ -79,6 +92,11 @@ interface Coordinates {
 declare type Yurbo = DBObject & { event_id: string } & Coordinates & {
     location_id?: string;
   };
+
+declare type Friend = DBObject & { userId: string } & { name: string } & {
+  id: string;
+  created_at: Timestamp;
+};
 
 /* Class for Event/Activity */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

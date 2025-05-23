@@ -14,6 +14,14 @@ export const ERRORS = {
     GET: '',
     POST: '',
   },
+  FRIEND: {
+    NOTFOUND: 'Email not found',
+    CREATED: 'Friend failed to create',
+    ALREADYEXISTS: 'Friend already exists',
+    GETFOLLOWEES: 'Failed to retrieve those you follow.',
+    GETFOLLOWERS: 'Failed to retrieve those you follow.',
+    GETPARAMS: 'Invalid GET params',
+  },
   UNATHORIZED: 'User not authorized',
   UNKNOWN: 'An unknown error occurred',
 };

@@ -20,6 +20,10 @@ export const eventFormSchema = z.object({
   ...baseFormSchema.shape,
 });
 
+export const friendFormSchema = z.object({
+  email: z.string().email().min(3, 'Email is required'),
+});
+
 export const yurboFormSchema = z.object({
   ...baseFormSchema.shape,
   ...coordinatesFormSchema.shape,
@@ -33,5 +37,6 @@ export const locationFormSchema = z.object({
 });
 
 export type EventFormData = z.infer<typeof eventFormSchema>;
+export type FriendFormData = z.infer<typeof friendFormSchema>;
 export type YurboFormData = z.infer<typeof yurboFormSchema>;
 export type LocationFormData = z.infer<typeof locationFormSchema>;

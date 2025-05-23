@@ -46,15 +46,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           )
         )?.docs?.[0];
 
-        const userData = userDoc?.data() ?? {
-          id: (
-            await addDoc(collection(firestore, C.COLLECTIONS.USERS), {
-              name: user.name,
-              email: user.email,
-              created_at: serverTimestamp(),
-            })
-          ).id,
-        };
+        const userData = userDoc
+          ? { ...userDoc.data(), id: userDoc.id }
+          : {
+              id: (
+                await addDoc(collection(firestore, C.COLLECTIONS.USERS), {
+                  name: user.name,
+                  email: user.email,
+                  created_at: serverTimestamp(),
+                })
+              ).id,
+            };
 
         token.user = {
           ...user,

@@ -4,7 +4,7 @@
 
 @layer components {
   .btn-primary {
-    @apply rounded-xl border-2 border-green-700 bg-green-700 p-2 font-bold text-white hover:cursor-pointer hover:bg-white hover:text-green-700;
+    @apply rounded-xl border-2 border-green-700 bg-green-700 p-2 font-bold text-white hover:cursor-pointer hover:bg-white hover:text-green-700 disabled:cursor-not-allowed disabled:bg-gray-500;
   }
 }
 

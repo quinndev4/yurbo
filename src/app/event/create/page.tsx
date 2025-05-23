@@ -40,7 +40,7 @@ export default function CreateEventPage() {
 
       alert(JSON.stringify(data, null, 2));
 
-      setEvents((oldEvents) => [data.event, ...oldEvents]);
+      setEvents((oldEvents) => oldEvents.set(data.event.id, data.event));
 
       router.push('/');
     } catch (error) {

@@ -54,7 +54,9 @@ export default function CreateLocationPage() {
 
       alert(JSON.stringify(data, null, 2));
 
-      setLocations((oldLocations) => [data.location, ...oldLocations]);
+      setLocations((oldLocations) =>
+        oldLocations.set(data.location.id, data.location)
+      );
 
       router.push('/');
     } catch (error) {

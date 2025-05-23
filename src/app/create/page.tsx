@@ -22,7 +22,7 @@ export default function CreateYurboPage() {
       name: 'event_id',
       label: 'Event',
       type: 'select',
-      options: events.map((event) => ({
+      options: [...events].map(([, event]) => ({
         label: `${event.name} - ${event.description}`,
         value: event.id,
       })),
@@ -31,7 +31,7 @@ export default function CreateYurboPage() {
       name: 'location_id',
       label: 'Location',
       type: 'select',
-      options: locations.map((loc) => ({
+      options: [...locations].map(([, loc]) => ({
         label: `${loc.name} - ${loc.description}`,
         value: loc.id,
       })),
@@ -60,7 +60,7 @@ export default function CreateYurboPage() {
     setSubmitting(true);
 
     try {
-      const res = await fetch(C.ROUTES.events(session?.user?.id), {
+      const res = await fetch(C.ROUTES.yurbos(session?.user?.id), {
         method: 'POST',
         body: JSON.stringify(yurbo),
       });
@@ -69,7 +69,13 @@ export default function CreateYurboPage() {
 
       alert(JSON.stringify(data, null, 2));
 
-      setYurbos((oldYurbos) => [data.yurbo, ...oldYurbos]);
+      const location = yurbo.location_id && locations.get(yurbo.location_id);
+
+      if (location) {
+        ({ lat: yurbo.lat, long: yurbo.long } = location);
+      }
+
+      setYurbos((oldYurbos) => oldYurbos.set(data.yurbo.id, data.yurbo));
     } catch (error) {
       alert(
         JSON.stringify({ ...yurbo, ...getErrorMessgaeSuccess(error) }, null, 2)

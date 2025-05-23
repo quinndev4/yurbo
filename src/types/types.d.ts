@@ -76,10 +76,9 @@ interface Coordinates {
 }
 
 /* Class for a Yurbo */
-type Yurbo = DBObject & { event_id: string } & (
-    | ({ location_id: string } & Never<Coordinates>)
-    | (Coordinates & { location_id?: never })
-  );
+declare type Yurbo = DBObject & { event_id: string } & Coordinates & {
+    location_id?: string;
+  };
 
 /* Class for Event/Activity */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

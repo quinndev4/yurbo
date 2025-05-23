@@ -41,7 +41,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           await getDocs(
             query(
               collection(firestore, C.COLLECTIONS.USERS),
-              where('email', '==', 'quinndevtest@gmail.com')
+              where('email', '==', user.email)
             )
           )
         )?.docs?.[0];

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 import {
-  Map,
+  Map as MapComponent,
   Marker,
   Popup,
   NavigationControl,
@@ -13,15 +13,22 @@ import {
 } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
-import CITIES from '@/components/cities.json';
 import Pin from './Pin';
+import { Yurbo } from '@/types/types';
+import { Map } from 'immutable';
 
-export default function TestMapBasic() {
-  const [popupInfo, setPopupInfo] = useState<(typeof CITIES)[0] | null>(null);
+export default function TestMapBasic({
+  yurbos,
+}: {
+  yurbos: Map<string, Yurbo>;
+}) {
+  const [selectedYurbo, setSelectedYurbo] = useState<Yurbo | null>(null);
+
+  console.log('jheyo', [...yurbos]);
 
   return (
     <div className='h-full w-full'>
-      <Map
+      <MapComponent
         attributionControl={false}
         initialViewState={{
           latitude: 40,
@@ -37,44 +44,34 @@ export default function TestMapBasic() {
         <NavigationControl position='top-left' />
         <ScaleControl />
 
-        {CITIES.map((city, index) => (
+        {[...yurbos].map(([, yurbo]) => (
           <Marker
-            key={`marker-${index}`}
-            longitude={city.longitude}
-            latitude={city.latitude}
+            key={`marker-${yurbo.id}`}
+            longitude={yurbo.long}
+            latitude={yurbo.lat}
             anchor='bottom'
             onClick={(e) => {
               // If we let the click event propagates to the map, it will immediately close the popup
               // with `closeOnClick: true`
               e.originalEvent.stopPropagation();
-              setPopupInfo(city);
+              setSelectedYurbo(yurbo);
             }}
           >
             <Pin />
           </Marker>
         ))}
 
-        {popupInfo && (
+        {selectedYurbo && (
           <Popup
             anchor='top'
-            longitude={Number(popupInfo.longitude)}
-            latitude={Number(popupInfo.latitude)}
-            onClose={() => setPopupInfo(null)}
+            longitude={selectedYurbo.long}
+            latitude={selectedYurbo.lat}
+            onClose={() => setSelectedYurbo(null)}
           >
-            <div>
-              {popupInfo.city}, {popupInfo.state} |{' '}
-              <a
-                target='_new'
-                href={`http://en.wikipedia.org/w/index.php?title=Special:Search&search=${popupInfo.city}, ${popupInfo.state}`}
-              >
-                Wikipedia
-              </a>
-            </div>
-
-            <img width='100%' src={popupInfo.image} />
+            {selectedYurbo.name}
           </Popup>
         )}
-      </Map>
+      </MapComponent>
     </div>
   );
 }

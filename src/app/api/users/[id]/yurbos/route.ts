@@ -58,6 +58,8 @@ export async function POST(request: NextRequest) {
       }
     );
 
+    console.log(res, body);
+
     revalidatePath(C.ROUTES.yurbos(session.user.id));
 
     // return successful response

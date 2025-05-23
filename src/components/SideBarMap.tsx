@@ -1,28 +1,49 @@
-'use client';
-
-import { useRef, useState } from 'react';
-
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Map as MapComponent,
   Marker,
-  Popup,
+  MapRef,
   NavigationControl,
   FullscreenControl,
   ScaleControl,
   GeolocateControl,
+  Popup,
 } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
-
-import Pin from './Pin';
-import { Yurbo } from '@/types/types';
 import { Map } from 'immutable';
 import { Timestamp } from 'firebase/firestore';
+import Pin from './Pin';
+import { Yurbo } from '@/types/types';
 
-export default function TestMapBasic() {
-  const [menuOpen, setIsSidebarOpen] = useState(true);
+const MapWithSidebar = () => {
+  const mapRef = useRef<MapRef>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedYurbo, setSelectedYurbo] = useState<Yurbo | null>(null);
 
   const cardRefs = useRef<{ [id: string]: HTMLLIElement | null }>({});
+
+  const scrollToYurbo = (yurbo: Yurbo) => {
+    // Scroll to the corresponding card
+    cardRefs.current[yurbo.id]?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+    });
+
+    const map = mapRef.current?.getMap();
+
+    console.log('hey', map);
+
+    map?.flyTo({
+      center: [yurbo.long, yurbo.lat],
+      zoom: 12, // Adjust zoom level as needed
+      speed: 1.2, // Animation speed
+      curve: 1.42, // Animation curve
+      easing: (t) => t, // Easing function
+      essential: true, // This animation is considered essential
+    });
+
+    setSelectedYurbo(yurbos.get(yurbo.id) ?? null);
+  };
 
   const yurbos = Map([
     [
@@ -387,47 +408,115 @@ export default function TestMapBasic() {
     ],
   ]);
 
-  // const handleMarkerClick = (id: string) => {
-  //   const card = cardRefs.current[id];
-  //   if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  //   if (!menuOpen) setIsSidebarOpen(true);
-  // };
+  //   useEffect(() => {
+  //     if (mapRef.current && yurbos.size) {
+  //       const map = mapRef.current.getMap();
+
+  //       const lats = [...yurbos].map(([, y]) => y.lat);
+  //       const lngs = [...yurbos].map(([, y]) => y.long);
+
+  //       const minLat = Math.min(...lats);
+  //       const maxLat = Math.max(...lats);
+  //       const minLng = Math.min(...lngs);
+  //       const maxLng = Math.max(...lngs);
+
+  //       map.fitBounds(
+  //         [
+  //           [minLng, minLat],
+  //           [maxLng, maxLat],
+  //         ],
+  //         {
+  //           padding: {
+  //             left: isSidebarOpen ? 300 : 50, // Adjust based on sidebar width
+  //             right: 50,
+  //             top: 50,
+  //             bottom: 50,
+  //           },
+  //           duration: 1000,
+  //         }
+  //       );
+  //     }
+  //   }, [yurbos, isSidebarOpen]);
+
+  // useEffect(() => {
+  //   if (mapRef.current && yurbos.size) {
+  //     const map = mapRef.current.getMap();
+
+  //     const lats = [...yurbos].map(([, y]) => y.lat);
+  //     const lngs = [...yurbos].map(([, y]) => y.long);
+
+  //     const minLat = Math.min(...lats);
+  //     const maxLat = Math.max(...lats);
+  //     const minLng = Math.min(...lngs);
+  //     const maxLng = Math.max(...lngs);
+
+  //     map.fitBounds(
+  //       [
+  //         [minLng, minLat],
+  //         [maxLng, maxLat],
+  //       ],
+  //       {
+  //         padding: 100, // Adjust padding as needed
+  //         duration: 1000, // Animation duration in milliseconds
+  //       }
+  //     );
+  //   }
+  // }, [yurbos]);
 
   const toggleSidebar = () => {
     setIsSidebarOpen((prev) => !prev);
 
-    if (mapRef.current) {
-      mapRef.current.easeTo({
-        padding: {
-          left: isSidebarOpen ? 0 : 300, // Adjust this value based on your sidebar width
-          top: 0,
-          right: 0,
-          bottom: 0,
-        },
-        duration: 1000, // Duration in milliseconds
-      });
-    }
+    mapRef.current?.getMap()?.easeTo({
+      padding: {
+        left: isSidebarOpen ? 0 : 300, // Adjust based on sidebar width
+        top: 0,
+        right: 0,
+        bottom: 0,
+      },
+      duration: 1000, // Duration in milliseconds
+    });
   };
 
-  console.log('jheyo', [...yurbos]);
-
   return (
-    <div className='flex h-full w-full'>
-      {/* Toggle Button */}
-      <button
-        onClick={toggleSidebar}
-        style={{
-          position: 'absolute',
-          top: 20,
-          left: isSidebarOpen ? 320 : 20,
-          zIndex: 2,
-        }}
+    <div className='relative flex h-full w-full'>
+      {/* Sidebar and Toggle Button Wrapper */}
+      <div
+        className={`absolute z-10 flex h-[100%] items-center justify-center p-2 transition-transform duration-1000 ease-in-out ${
+          isSidebarOpen ? 'translate-x-0' : '-translate-x-[320px]'
+        }`}
       >
-        {isSidebarOpen ? 'Close Sidebar' : 'Open Sidebar'}
-      </button>
+        {/* Sidebar */}
+        <div className='h-full w-[300px] overflow-y-auto rounded-lg bg-white shadow-lg'>
+          {/* Sidebar content */}
+          <ul className='space-y-4 p-4'>
+            {[...yurbos].map(([, yurbo]) => (
+              <li
+                key={`sidebar-li-${yurbo.id}`}
+                ref={(el) => {
+                  cardRefs.current[yurbo.id] = el;
+                }}
+                onClick={() => scrollToYurbo(yurbo)}
+                className={`rounded-lg bg-gray-100 p-4 shadow transition hover:cursor-pointer hover:shadow-md ${selectedYurbo?.id === yurbo.id ? 'bg-gray-500' : ''}`}
+              >
+                <h3 className='font-semibold text-black'>{yurbo.name}</h3>
+                <p className='text-sm text-gray-600'>{yurbo.description}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
 
+        {/* Toggle Button */}
+        <button
+          onClick={toggleSidebar}
+          className='mt-4 ml-6 h-10 w-10 rounded-lg bg-white text-black shadow-lg hover:cursor-pointer focus:outline-none'
+        >
+          {isSidebarOpen ? <span>&larr;</span> : <span>&rarr;</span>}
+        </button>
+      </div>
+
+      {/* Map Container */}
       <MapComponent
-        attributionControl={false}
+        ref={mapRef}
         initialViewState={{
           latitude: 40,
           longitude: -100,
@@ -435,11 +524,12 @@ export default function TestMapBasic() {
           bearing: 0,
           pitch: 0,
         }}
+        style={{ width: '100%', height: '100%' }}
         mapStyle='https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
       >
-        <GeolocateControl position='top-left' />
-        <FullscreenControl position='top-left' />
-        <NavigationControl position='top-left' />
+        <GeolocateControl position='top-right' />
+        <FullscreenControl position='top-right' />
+        <NavigationControl position='top-right' />
         <ScaleControl />
 
         {[...yurbos].map(([, yurbo]) => (
@@ -449,57 +539,28 @@ export default function TestMapBasic() {
             latitude={yurbo.lat}
             anchor='bottom'
             onClick={(e) => {
-              // If we let the click event propagates to the map, it will immediately close the popup
-              // with `closeOnClick: true`
               e.originalEvent.stopPropagation();
-              setSelectedYurbo(yurbo);
+              scrollToYurbo(yurbo);
             }}
           >
-            <Pin size={selectedYurbo?.id === yurbo.id ? 50 : 20} />
+            <Pin selected={selectedYurbo?.id === yurbo.id} />
           </Marker>
         ))}
 
         {selectedYurbo && (
           <Popup
             anchor='top'
+            style={{ fontWeight: 800, color: 'black' }}
             longitude={selectedYurbo.long}
             latitude={selectedYurbo.lat}
             onClose={() => setSelectedYurbo(null)}
           >
-            <span className='font-extrabold text-black'>
-              {selectedYurbo.name}
-            </span>
+            {selectedYurbo.name}
           </Popup>
         )}
       </MapComponent>
-
-      {/* Yurbo list */}
-
-      <div
-        className={`fixed top-0 right-0 z-30 h-full w-72 transform bg-white shadow-lg transition-transform duration-300 ease-in-out ${
-          menuOpen ? 'translate-x-0' : 'translate-x-full'
-        } overflow-y-auto`}
-      >
-        <h2 className='border-b p-4 text-xl font-bold'>Yurbos</h2>
-        <ul className='space-y-4 p-4'>
-          {[...yurbos].map(([, yurbo]) => (
-            <li
-              key={yurbo.id}
-              ref={(el) => {
-                cardRefs.current[yurbo.id] = el;
-              }}
-              className='rounded-lg bg-gray-100 p-4 shadow transition hover:shadow-md'
-              onClick={() => {
-                handleMarkerClick(yurbo.id);
-                setSelectedYurbo(yurbo);
-              }}
-            >
-              <h3 className='font-semibold'>{yurbo.name}</h3>
-              <p className='text-sm text-gray-600'>{yurbo.description}</p>
-            </li>
-          ))}
-        </ul>
-      </div>
     </div>
   );
-}
+};
+
+export default MapWithSidebar;

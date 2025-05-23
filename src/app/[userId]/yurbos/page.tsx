@@ -1,5 +1,6 @@
 'use client';
 
+import MapWithSidebar from '@/components/SideBarMap';
 import TestMapBasic from '@/components/TestMap';
 import { useUserData } from '@/components/UserDataProvider';
 import { C } from '@/constants/constants';
@@ -36,5 +37,5 @@ export default function UserYurbosPage() {
     }
   }, [params.userId, session?.user?.id, myYurbos]);
 
-  return <TestMapBasic yurbos={yurbos} />;
+  return <MapWithSidebar />;
 }

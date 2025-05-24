@@ -18,36 +18,38 @@ export default function FriendsPage() {
   const { data: session } = useSession();
   const params = useParams();
 
-  const { followees: myFollowees } = useUserData();
-  const { followers: myFollowers } = useUserData();
+  const { followees } = useUserData();
+  const { followers } = useUserData();
 
-  const [followees, setFollowees] = useState<Map<string, Friend>>(Map());
-  const [followers, setFollowers] = useState<Map<string, Friend>>(Map());
+  // const [followees, setFollowees] = useState<Map<string, Friend>>(Map());
+  // const [followers, setFollowers] = useState<Map<string, Friend>>(Map());
 
-  useEffect(() => {
-    if (session?.user?.id) {
-      if (params.userId === session.user.id) {
-        window.history.replaceState(null, '', '/me/friends');
-      }
+  // [...followees].map(([id, followee]) => console.log('followee id:', id));
 
-      if (!['me', session.user.id].includes(params.userId as string)) {
-        fetch(C.ROUTES.followees(params.userId as string), {
-          cache: 'force-cache',
-        })
-          .then((res) => res.json())
-          .then((res) => setFollowees(res));
+  // useEffect(() => {
+  //   if (session?.user?.id) {
+  //     if (params.userId === session.user.id) {
+  //       window.history.replaceState(null, '', '/me/friends');
+  //     }
 
-        fetch(C.ROUTES.followers(params.userId as string), {
-          cache: 'force-cache',
-        })
-          .then((res) => res.json())
-          .then((res) => setFollowers(res));
-      } else {
-        setFollowees(myFollowees);
-        setFollowers(myFollowers);
-      }
-    }
-  }, [params.userId, session?.user?.id, myFollowees, myFollowers]);
+  //     if (!['me', session.user.id].includes(params.userId as string)) {
+  //       fetch(C.ROUTES.followees(params.userId as string), {
+  //         cache: 'force-cache',
+  //       })
+  //         .then((res) => res.json())
+  //         .then((res) => setFollowees(res));
+
+  //       fetch(C.ROUTES.followers(params.userId as string), {
+  //         cache: 'force-cache',
+  //       })
+  //         .then((res) => res.json())
+  //         .then((res) => setFollowers(res));
+  //     } else {
+  //       setFollowees(myFollowees);
+  //       setFollowers(myFollowers);
+  //     }
+  //   }
+  // }, [params.userId, session?.user?.id, myFollowees, myFollowers]);
 
   console.log('Those I follow:\n', followees);
 
@@ -87,6 +89,23 @@ export default function FriendsPage() {
 
   return (
     <>
+      <div>
+        <h1>Following:</h1>
+        {[...followees].map(([, followee]) => (
+          <div key={followee.id}>
+            <p>{followee.id}</p>
+          </div>
+        ))}
+
+        <h1>Followers:</h1>
+
+        {[...followers].map(([, follower]) => (
+          <div key={follower.id}>
+            <p>{follower.id}</p>
+          </div>
+        ))}
+      </div>
+
       <FormLayout title='Follow User'>
         <FormBuilder
           schema={friendFormSchema}

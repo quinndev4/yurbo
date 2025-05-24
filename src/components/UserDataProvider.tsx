@@ -70,12 +70,12 @@ export default function UserDataProvider({
               cache: 'force-cache',
             })
               .then((res) => res.json())
-              .then((res) => res.followees),
+              .then((res) => res.ret_list),
             fetch(C.ROUTES.followers(session.user.id), {
               cache: 'force-cache',
             })
               .then((res) => res.json())
-              .then((res) => res.followers),
+              .then((res) => res.ret_list),
           ]);
 
           console.log('user data', {

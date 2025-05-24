@@ -29,7 +29,7 @@ export default function UserYurbosPage() {
           cache: 'force-cache',
         })
           .then((res) => res.json())
-          .then((res) => setYurbos(res.yurbos));
+          .then((res) => setYurbos(res.ret));
       } else {
         setYurbos(myYurbos);
       }

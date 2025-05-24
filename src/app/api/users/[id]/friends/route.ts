@@ -32,10 +32,10 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const ret_list =
+    const ret =
       query === 'following' ? await getFollowees() : await getFollowers();
 
-    return Response.json({ ret_list });
+    return Response.json({ ret });
   } catch (error) {
     const errorMessage = getErrorMessage(error);
 

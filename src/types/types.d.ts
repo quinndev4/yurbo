@@ -116,3 +116,10 @@ declare interface CreateLocationResponse extends GenericResponse {
 declare interface CreateLocationError extends GenericError {
   name: string;
 }
+
+/* Class for a User */
+declare interface User {
+  id: string;
+  name: string;
+  email: string;
+}

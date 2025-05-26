@@ -5,7 +5,7 @@ import { ERRORS, getErrorMessage } from '@/constants/errors';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import { firestore } from '@/firebase';
 import { LOGS } from '@/constants/logs';
-import { Friend } from '@/types/types';
+import { Friend, User } from '@/types/types';
 import { C } from '@/constants/constants';
 
 export async function getFollowees(): Promise<Friend[]> {

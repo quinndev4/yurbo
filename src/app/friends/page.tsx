@@ -13,6 +13,12 @@ import { getErrorMessgaeSuccess } from '@/constants/errors';
 import { C } from '@/constants/constants';
 import { useSession } from 'next-auth/react';
 import { useParams } from 'next/navigation';
+import UsersTable from '@/components/UsersTable';
+
+interface User {
+  id: string;
+  name: string;
+}
 
 export default function FriendsPage() {
   const { data: session } = useSession();
@@ -20,6 +26,12 @@ export default function FriendsPage() {
 
   const { followees } = useUserData();
   const { followers } = useUserData();
+  const sampleUsers: User[] = [
+    { id: 'u1', name: 'Alice Johnson' },
+    { id: 'u2', name: 'Bob Smith' },
+    { id: 'u3', name: 'Carol Williams' },
+    { id: 'u4', name: 'David Brown' },
+  ];
 
   // const [followees, setFollowees] = useState<Map<string, Friend>>(Map());
   // const [followers, setFollowers] = useState<Map<string, Friend>>(Map());
@@ -98,12 +110,7 @@ export default function FriendsPage() {
         ))}
 
         <h1>Followers:</h1>
-
-        {[...followers].map(([, follower]) => (
-          <div key={follower.id}>
-            <p>{follower.id}</p>
-          </div>
-        ))}
+        <UsersTable users={sampleUsers} tableName='FOLLOWERS' />
       </div>
 
       <FormLayout title='Follow User'>

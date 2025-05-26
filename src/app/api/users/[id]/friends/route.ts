@@ -9,9 +9,8 @@ import {
 import { auth } from '@/auth';
 import { ERRORS, getErrorMessage } from '@/constants/errors';
 import { LOGS } from '@/constants/logs';
-import { getFollowees } from '@/app/actions/getFollowees';
+import { getFollowing } from '@/app/actions/getFollowing';
 import { getFollowers } from '@/app/actions/getFollowers';
-
 import { revalidatePath } from 'next/cache';
 import { NextRequest } from 'next/server';
 import { C } from '@/constants/constants';
@@ -32,8 +31,10 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    console.log(`Doing a ${query} grab.`);
+
     const ret =
-      query === 'following' ? await getFollowees() : await getFollowers();
+      query === 'following' ? await getFollowing() : await getFollowers();
 
     return Response.json({ ret });
   } catch (error) {
@@ -75,8 +76,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get followee's info
-    const followeeDoc = (
+    // Get following's info
+    const followerDoc = (
       await getDocs(
         query(
           collection(firestore, C.COLLECTIONS.USERS),
@@ -85,87 +86,35 @@ export async function POST(request: NextRequest) {
       )
     )?.docs?.[0];
 
-    // Followee doesnt exist, return error code
-    if (!followeeDoc) {
-      return Response.json(
-        { success: false, message: ERRORS.FRIEND.NOTFOUND },
-        { status: 404 }
-      );
-    }
-
     const created_at = serverTimestamp(); // When relationship starts
 
     // manually spreading to omit created_at that exists when user profile got created
-    const followee = {
-      email: followeeDoc.data().email,
-      name: followeeDoc.data().name,
-      id: followeeDoc.id,
+    const follower = {
+      email: followerDoc.data().email,
+      name: followerDoc.data().name,
+      id: followerDoc.id,
       created_at: created_at,
     };
 
-    console.log('Found user:', followee);
+    console.log('Found user:', follower);
 
-    // Check that user doesnt follow followee already
-    const followingDoc = (
-      await getDocs(
-        query(
-          collection(
-            firestore,
-            C.COLLECTIONS.USERS,
-            session.user.id,
-            C.COLLECTIONS.FOLLOWING
-          ),
-          where('id', '==', followee.id)
-        )
-      )
-    )?.docs?.[0];
-
-    if (followingDoc) {
-      return Response.json(
-        { success: false, message: ERRORS.FRIEND.ALREADYEXISTS },
-        { status: 404 }
-      );
-    }
-
-    // add to your following list
+    // Add relationship to "Followers" collection
     const followFriendRes = await addDoc(
-      collection(
-        firestore,
-        C.COLLECTIONS.USERS,
-        session.user.id,
-        C.COLLECTIONS.FOLLOWING
-      ),
+      collection(firestore, C.COLLECTIONS.FOLLOWERS),
       {
-        id: followee.id,
+        user_id: follower.id,
+        follower_id: session?.user?.id,
         created_at,
       }
     );
-
-    // add to their followers list
-    const friendFollowedRes = await addDoc(
-      collection(
-        firestore,
-        C.COLLECTIONS.USERS,
-        followee.id,
-        C.COLLECTIONS.FOLLOWERS
-      ),
-      {
-        id: session.user.id,
-        created_at,
-      }
-    );
-
-    console.log('Now following:', followee);
-
-    // revalidatePath(C.ROUTES.yurbos(session.user.id));
+    revalidatePath(C.ROUTES.following(session.user.id));
 
     // return successful response
-    // console.log(LOGS.YURBO.CREATED, location_id, body);
     return Response.json(
       {
         message: LOGS.FRIEND.created(email),
         success: true,
-        friend: followee,
+        friend: follower,
       },
       { status: 200 }
     );

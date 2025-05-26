@@ -5,10 +5,10 @@ import { ERRORS, getErrorMessage } from '@/constants/errors';
 import { collection, getDocs, orderBy, query, where } from 'firebase/firestore';
 import { firestore } from '@/firebase';
 import { LOGS } from '@/constants/logs';
-import { Friend } from '@/types/types';
+import { Friend, User } from '@/types/types';
 import { C } from '@/constants/constants';
 
-export async function getFollowers(): Promise<Friend[]> {
+export async function getFollowing(): Promise<Friend[]> {
   try {
     const session = await auth();
 
@@ -18,34 +18,50 @@ export async function getFollowers(): Promise<Friend[]> {
     }
 
     // get all records where user is the follower
-    const followers_snapshot = await getDocs(
+    const following_snapshot = await getDocs(
       query(
         collection(firestore, C.COLLECTIONS.FOLLOWERS),
-        where('user_id', '==', session?.user?.id)
+        where('follower_id', '==', session?.user?.id)
       )
     );
 
-    const followers_list = followers_snapshot.docs.map((doc) => {
+    // EX:
+    //     let loadedPosts = {};
+    // posts = db.collection('posts')
+    //           .orderBy('timestamp', 'desc')
+    //           .limit(3);
+    // posts.get()
+    // .then((docSnaps) => {
+    //   docSnaps.forEach((doc) => {
+    //     loadedPosts[doc.id] = doc.data();
+    //     db.collection('users').child(doc.data().uid).get().then((userDoc) => {
+    //       loadedPosts[doc.id].userName = userDoc.data().name;
+    //     });
+    //   })
+    // });
+
+    const following_list = following_snapshot.docs.map((doc) => {
       const data = doc.data();
-      return { id: data.follower_id, created_at: data.created_at } as Friend;
+      return { id: data.user_id, created_at: data.created_at } as Friend;
     });
 
-    console.log('your following list:', followers_list);
+    console.log('your following list:', following_list);
+
     // return successful response
     console.log(
       LOGS.FRIEND.GOT,
       session.user.email,
-      followers_list,
+      following_list,
       Date.now()
     );
 
-    return followers_list;
+    return following_list;
   } catch (error) {
     const errorMessage = getErrorMessage(error);
 
     // failure
     console.error(
-      ERRORS.FRIEND.GETFOLLOWERS,
+      ERRORS.FRIEND.GETFOLLOWEES,
       JSON.stringify({ message: errorMessage })
     );
     throw new Error(errorMessage);

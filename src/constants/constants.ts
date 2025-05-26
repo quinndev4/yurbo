@@ -4,7 +4,6 @@ const COLLECTIONS = {
   YURBOS: 'yurbos',
   EVENTS: 'events',
   LOCATIONS: 'locations',
-  FOLLOWING: 'following',
   FOLLOWERS: 'followers',
 };
 
@@ -18,7 +17,7 @@ const ROUTES = {
   friends: (id?: string) => `/api/${COLLECTIONS.USERS}/${id}/friends`,
   followers: (id?: string) =>
     `/api/${COLLECTIONS.USERS}/${id}/friends?query=followers`,
-  followees: (id?: string) =>
+  following: (id?: string) =>
     `/api/${COLLECTIONS.USERS}/${id}/friends?query=following`,
 };
 

@@ -14,6 +14,7 @@ import { C } from '@/constants/constants';
 import { useSession } from 'next-auth/react';
 import { useParams } from 'next/navigation';
 import UsersTable from '@/components/UsersTable';
+import Button from '@/components/Button';
 
 interface User {
   id: string;
@@ -24,14 +25,35 @@ export default function FriendsPage() {
   const { data: session } = useSession();
   const params = useParams();
 
-  const { followees } = useUserData();
-  const { followers } = useUserData();
+  const { following, followers, setFollowers, setFollowing } = useUserData();
+
+  // const [followers, setFollowers] = useState<Map<string, Friend>>(Map());
+  // const [following, setFollowing] = useState<Map<string, Friend>>(Map());
+
+  // useEffect(() => {
+
+  // }, [myFollowers, myFollowing]);
+
   const sampleUsers: User[] = [
     { id: 'u1', name: 'Alice Johnson' },
     { id: 'u2', name: 'Bob Smith' },
     { id: 'u3', name: 'Carol Williams' },
     { id: 'u4', name: 'David Brown' },
   ];
+
+  const getFollowing = async () => {
+    const res = await fetch(C.ROUTES.following(session?.user?.id));
+    const following: Friend[] = await res.json();
+
+    console.log('following:', following);
+  };
+
+  const getFollowers = async () => {
+    const res = await fetch(C.ROUTES.followers(session?.user?.id));
+    const followers: Friend[] = await res.json();
+
+    console.log('followers:', followers);
+  };
 
   // const [followees, setFollowees] = useState<Map<string, Friend>>(Map());
   // const [followers, setFollowers] = useState<Map<string, Friend>>(Map());
@@ -63,7 +85,7 @@ export default function FriendsPage() {
   //   }
   // }, [params.userId, session?.user?.id, myFollowees, myFollowers]);
 
-  console.log('Those I follow:\n', followees);
+  // console.log('Those I follow:\n', following);
 
   const router = useRouter();
 
@@ -84,8 +106,9 @@ export default function FriendsPage() {
 
       const response: CreateFriendResponse = await res.json();
       alert(JSON.stringify(response, null, 2));
-
-      router.push('/');
+      setFollowing((oldFollowing) =>
+        oldFollowing.set(response.friend.id, response.friend)
+      );
     } catch (error) {
       alert(
         JSON.stringify(
@@ -103,14 +126,18 @@ export default function FriendsPage() {
     <>
       <div>
         <h1>Following:</h1>
-        {[...followees].map(([, followee]) => (
-          <div key={followee.id}>
-            <p>{followee.id}</p>
+        {[...following].map(([, following]) => (
+          <div key={following.id}>
+            <p>{following.id}</p>
           </div>
         ))}
 
         <h1>Followers:</h1>
-        <UsersTable users={sampleUsers} tableName='FOLLOWERS' />
+        {[...followers].map(([, follower]) => (
+          <div key={follower.id}>
+            <p>{follower.id}</p>
+          </div>
+        ))}
       </div>
 
       <FormLayout title='Follow User'>
@@ -121,6 +148,8 @@ export default function FriendsPage() {
           submitting={submitting}
         />
       </FormLayout>
+      <Button onClick={getFollowers}>Get Followers</Button>
+      <Button onClick={getFollowing}>Get Following</Button>
     </>
   );
 }

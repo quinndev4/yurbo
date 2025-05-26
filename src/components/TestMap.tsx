@@ -387,11 +387,11 @@ export default function TestMapBasic() {
     ],
   ]);
 
-  // const handleMarkerClick = (id: string) => {
-  //   const card = cardRefs.current[id];
-  //   if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  //   if (!menuOpen) setIsSidebarOpen(true);
-  // };
+  const handleMarkerClick = (id: string) => {
+    const card = cardRefs.current[id];
+    if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (!menuOpen) setIsSidebarOpen(true);
+  };
 
   const toggleSidebar = () => {
     setIsSidebarOpen((prev) => !prev);

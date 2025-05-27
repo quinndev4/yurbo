@@ -13,7 +13,6 @@ import { getErrorMessgaeSuccess } from '@/constants/errors';
 import { C } from '@/constants/constants';
 import { useSession } from 'next-auth/react';
 import { useParams } from 'next/navigation';
-import UsersTable from '@/components/UsersTable';
 import Button from '@/components/Button';
 
 interface User {
@@ -23,16 +22,8 @@ interface User {
 
 export default function FriendsPage() {
   const { data: session } = useSession();
-  const params = useParams();
 
   const { following, followers, setFollowers, setFollowing } = useUserData();
-
-  // const [followers, setFollowers] = useState<Map<string, Friend>>(Map());
-  // const [following, setFollowing] = useState<Map<string, Friend>>(Map());
-
-  // useEffect(() => {
-
-  // }, [myFollowers, myFollowing]);
 
   const getFollowing = async () => {
     const res = await fetch(C.ROUTES.following(session?.user?.id));
@@ -47,38 +38,6 @@ export default function FriendsPage() {
 
     console.log('followers:', followers);
   };
-
-  // const [followees, setFollowees] = useState<Map<string, Friend>>(Map());
-  // const [followers, setFollowers] = useState<Map<string, Friend>>(Map());
-
-  // [...followees].map(([id, followee]) => console.log('followee id:', id));
-
-  // useEffect(() => {
-  //   if (session?.user?.id) {
-  //     if (params.userId === session.user.id) {
-  //       window.history.replaceState(null, '', '/me/friends');
-  //     }
-
-  //     if (!['me', session.user.id].includes(params.userId as string)) {
-  //       fetch(C.ROUTES.followees(params.userId as string), {
-  //         cache: 'force-cache',
-  //       })
-  //         .then((res) => res.json())
-  //         .then((res) => setFollowees(res));
-
-  //       fetch(C.ROUTES.followers(params.userId as string), {
-  //         cache: 'force-cache',
-  //       })
-  //         .then((res) => res.json())
-  //         .then((res) => setFollowers(res));
-  //     } else {
-  //       setFollowees(myFollowees);
-  //       setFollowers(myFollowers);
-  //     }
-  //   }
-  // }, [params.userId, session?.user?.id, myFollowees, myFollowers]);
-
-  // console.log('Those I follow:\n', following);
 
   const router = useRouter();
 
@@ -117,22 +76,26 @@ export default function FriendsPage() {
 
   return (
     <>
-      <div>
-        <h1>Following:</h1>
-        {[...following].map(([, following]) => (
-          <div key={following.id}>
-            <p>{following.id}</p>
-          </div>
-        ))}
+      <div className='flex flex-row gap-x-7'>
+        <div className='flex flex-col'>
+          <h1>Following:</h1>
+          {[...following].map(([, following]) => (
+            <div className='flex flex-row' key={following.id}>
+              <p className='text-xs'>{following.id}</p>
+            </div>
+          ))}
+        </div>
 
-        <h1>Followers:</h1>
-        {[...followers].map(([, follower]) => (
-          <div key={follower.id}>
-            <p>{follower.name}</p>
-            <p>{follower.email}</p>
-            <p>{follower.id}</p>
-          </div>
-        ))}
+        <div className='flex flex-col'>
+          <h1>Followers:</h1>
+          {[...followers].map(([, follower]) => (
+            <div className='flex flex-row' key={follower.id}>
+              <p className='text-xs'>
+                {follower.name} ({follower.email}){' '}
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
 
       <FormLayout title='Follow User'>

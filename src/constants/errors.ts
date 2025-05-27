@@ -21,6 +21,7 @@ export const ERRORS = {
     GETFOLLOWEES: 'Failed to retrieve those you follow.',
     GETFOLLOWERS: 'Failed to retrieve those you follow.',
     GETPARAMS: 'Invalid GET params',
+    YOURSELF: 'You cannot follow yourself',
   },
   UNATHORIZED: 'User not authorized',
   UNKNOWN: 'An unknown error occurred',

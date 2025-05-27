@@ -15,6 +15,7 @@ import { revalidatePath } from 'next/cache';
 import { NextRequest } from 'next/server';
 import { C } from '@/constants/constants';
 import { firestore } from '../../../../../firebase';
+import { User } from '@/types/types';
 
 export async function GET(request: NextRequest) {
   // GET params
@@ -77,7 +78,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get following's info
-    const followerDoc = (
+    const followingDoc = (
       await getDocs(
         query(
           collection(firestore, C.COLLECTIONS.USERS),
@@ -86,23 +87,56 @@ export async function POST(request: NextRequest) {
       )
     )?.docs?.[0];
 
+    // check if user is found
+    if (!followingDoc) {
+      return Response.json(
+        { success: false, message: ERRORS.FRIEND.NOTFOUND },
+        { status: 404 }
+      );
+    }
+
+    // check if user is yourself
+    if (followingDoc.id === session.user.id) {
+      return Response.json(
+        { success: false, message: ERRORS.FRIEND.YOURSELF },
+        { status: 401 }
+      );
+    }
+
     const created_at = serverTimestamp(); // When relationship starts
 
-    // manually spreading to omit created_at that exists when user profile got created
-    const follower = {
-      email: followerDoc.data().email,
-      name: followerDoc.data().name,
-      id: followerDoc.id,
-      created_at: created_at,
+    const following: User = {
+      id: followingDoc.id,
+      name: followingDoc.data().name,
+      email: followingDoc.data().email,
+      created_at: followingDoc.data().created_at,
     };
 
-    console.log('Found user:', follower);
+    console.log('Found user:', following);
+
+    // check if user already follows this head
+    const existingRelationship = (
+      await getDocs(
+        query(
+          collection(firestore, C.COLLECTIONS.FOLLOWERS),
+          where('follower_id', '==', session?.user?.id),
+          where('user_id', '==', following.id)
+        )
+      )
+    )?.docs?.[0];
+
+    if (existingRelationship) {
+      return Response.json(
+        { success: false, message: ERRORS.FRIEND.ALREADYEXISTS },
+        { status: 401 }
+      );
+    }
 
     // Add relationship to "Followers" collection
     const followFriendRes = await addDoc(
       collection(firestore, C.COLLECTIONS.FOLLOWERS),
       {
-        user_id: follower.id,
+        user_id: following.id,
         follower_id: session?.user?.id,
         created_at,
       }
@@ -114,7 +148,7 @@ export async function POST(request: NextRequest) {
       {
         message: LOGS.FRIEND.created(email),
         success: true,
-        friend: follower,
+        user_followed: following,
       },
       { status: 200 }
     );

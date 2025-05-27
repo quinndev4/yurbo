@@ -42,7 +42,9 @@ declare interface CreateFriendRequest extends NextRequest {
 }
 
 declare interface CreateFriendResponse extends GenericResponse {
-  friend: Friend;
+  message: string;
+  success: boolean;
+  user_followed: User;
 }
 
 declare interface CreateFriendError extends GenericError {

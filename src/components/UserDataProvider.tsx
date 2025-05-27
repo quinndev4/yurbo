@@ -13,8 +13,8 @@ interface UserDataContext {
   setEvents: React.Dispatch<React.SetStateAction<Map<string, Event>>>;
   locations: Map<string, Location>;
   setLocations: React.Dispatch<React.SetStateAction<Map<string, Location>>>;
-  following: Map<string, Friend>;
-  setFollowing: React.Dispatch<React.SetStateAction<Map<string, Friend>>>;
+  following: Map<string, User>;
+  setFollowing: React.Dispatch<React.SetStateAction<Map<string, User>>>;
   followers: Map<string, User>;
   setFollowers: React.Dispatch<React.SetStateAction<Map<string, User>>>;
 }
@@ -37,7 +37,7 @@ export default function UserDataProvider({
   const [yurbos, setYurbos] = useState<Map<string, Yurbo>>(Map());
   const [events, setEvents] = useState<Map<string, Event>>(Map());
   const [locations, setLocations] = useState<Map<string, Location>>(Map());
-  const [following, setFollowing] = useState<Map<string, Friend>>(Map());
+  const [following, setFollowing] = useState<Map<string, User>>(Map());
   const [followers, setFollowers] = useState<Map<string, User>>(Map());
 
   useEffect(() => {
@@ -48,7 +48,7 @@ export default function UserDataProvider({
             Yurbo[],
             Event[],
             Location[],
-            Friend[],
+            User[],
             User[],
           ] = await Promise.all([
             fetch(C.ROUTES.yurbos(session.user.id), {

@@ -24,10 +24,18 @@ export default function FriendsPage() {
   const { data: session } = useSession();
 
   const { following, followers, setFollowers, setFollowing } = useUserData();
+  const [errorMessage, setErrorMessage] = useState<string | null | undefined>(
+    null
+  );
+
+  const [success, setSuccess] = useState<boolean | null | undefined>(null);
+  const [userFollowed, setUserFollowed] = useState<string | null | undefined>(
+    null
+  );
 
   const getFollowing = async () => {
     const res = await fetch(C.ROUTES.following(session?.user?.id));
-    const following: Friend[] = await res.json();
+    const following: User[] = await res.json();
 
     console.log('following:', following);
   };
@@ -47,8 +55,24 @@ export default function FriendsPage() {
 
   const [submitting, setSubmitting] = useState(false);
 
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => {
+        setSuccess(false);
+      }, 3000);
+    }
+
+    if (errorMessage) {
+      const timer = setTimeout(() => {
+        setErrorMessage(null);
+      }, 3000);
+    }
+  }, [success, errorMessage]);
+
   const onSubmit = async (friendData: FriendFormData) => {
     setSubmitting(true);
+
+    let responseJson: CreateFriendResponse | null = null;
 
     try {
       const res = await fetch(C.ROUTES.friends(session?.user?.id), {
@@ -56,19 +80,44 @@ export default function FriendsPage() {
         body: JSON.stringify(friendData),
       });
 
-      const response: CreateFriendResponse = await res.json();
-      alert(JSON.stringify(response, null, 2));
-      setFollowing((oldFollowing) =>
-        oldFollowing.set(response.friend.id, response.friend)
-      );
+      responseJson = await res.json();
+
+      if (!res.ok) {
+        throw new Error('Failed to create new following');
+      }
+
+      // alert(JSON.stringify(responseJson, null, 2));
+
+      if (responseJson) {
+        setFollowing((oldFollowing) =>
+          oldFollowing.set(
+            responseJson!.user_followed.id,
+            responseJson!.user_followed
+          )
+        );
+      } else {
+        throw new Error('Response undefined');
+      }
+
+      setErrorMessage(null);
+      setSuccess(true);
+      setUserFollowed(responseJson.user_followed.name);
     } catch (error) {
-      alert(
-        JSON.stringify(
-          { ...location, ...getErrorMessgaeSuccess(error) },
-          null,
-          2
-        )
-      );
+      console.log('JSON RESPONSE:', JSON.stringify(responseJson));
+      // alert(
+      //   JSON.stringify(
+      //     {
+      //       ...(responseJson ?? { message: 'No response received' }),
+      //       ...location,
+      //       ...getErrorMessgaeSuccess(error),
+      //     },
+      //     null,
+      //     2
+      //   )
+      // );
+
+      setErrorMessage(responseJson?.message);
+      console.log(errorMessage);
     } finally {
       setSubmitting(false);
     }
@@ -81,7 +130,9 @@ export default function FriendsPage() {
           <h1>Following:</h1>
           {[...following].map(([, following]) => (
             <div className='flex flex-row' key={following.id}>
-              <p className='text-xs'>{following.id}</p>
+              <p className='text-xs'>
+                {following.name} ({following.email}){' '}
+              </p>
             </div>
           ))}
         </div>
@@ -105,6 +156,16 @@ export default function FriendsPage() {
           onSubmit={onSubmit}
           submitting={submitting}
         />
+        {errorMessage && (
+          <div className='mt-4 rounded border border-red-400 bg-red-100 p-3 text-red-700'>
+            <p>Error: {errorMessage}</p>
+          </div>
+        )}
+        {success && (
+          <div className='mt-4 rounded border border-green-600 bg-green-700 p-3 text-white'>
+            <p>Successfully followed {userFollowed}</p>
+          </div>
+        )}
       </FormLayout>
       <Button onClick={getFollowers}>Get Followers</Button>
       <Button onClick={getFollowing}>Get Following</Button>

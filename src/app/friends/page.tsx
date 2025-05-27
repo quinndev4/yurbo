@@ -34,13 +34,6 @@ export default function FriendsPage() {
 
   // }, [myFollowers, myFollowing]);
 
-  const sampleUsers: User[] = [
-    { id: 'u1', name: 'Alice Johnson' },
-    { id: 'u2', name: 'Bob Smith' },
-    { id: 'u3', name: 'Carol Williams' },
-    { id: 'u4', name: 'David Brown' },
-  ];
-
   const getFollowing = async () => {
     const res = await fetch(C.ROUTES.following(session?.user?.id));
     const following: Friend[] = await res.json();
@@ -50,7 +43,7 @@ export default function FriendsPage() {
 
   const getFollowers = async () => {
     const res = await fetch(C.ROUTES.followers(session?.user?.id));
-    const followers: Friend[] = await res.json();
+    const followers: User[] = await res.json();
 
     console.log('followers:', followers);
   };
@@ -135,6 +128,8 @@ export default function FriendsPage() {
         <h1>Followers:</h1>
         {[...followers].map(([, follower]) => (
           <div key={follower.id}>
+            <p>{follower.name}</p>
+            <p>{follower.email}</p>
             <p>{follower.id}</p>
           </div>
         ))}

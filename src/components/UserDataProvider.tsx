@@ -2,7 +2,7 @@
 
 import { Map } from 'immutable';
 import { C } from '@/constants/constants';
-import { Event, Location, Yurbo, Friend } from '@/types/types';
+import { Event, Location, Yurbo, Friend, User } from '@/types/types';
 import { useSession } from 'next-auth/react';
 import { createContext, useContext, useEffect, useState } from 'react';
 
@@ -15,8 +15,8 @@ interface UserDataContext {
   setLocations: React.Dispatch<React.SetStateAction<Map<string, Location>>>;
   following: Map<string, Friend>;
   setFollowing: React.Dispatch<React.SetStateAction<Map<string, Friend>>>;
-  followers: Map<string, Friend>;
-  setFollowers: React.Dispatch<React.SetStateAction<Map<string, Friend>>>;
+  followers: Map<string, User>;
+  setFollowers: React.Dispatch<React.SetStateAction<Map<string, User>>>;
 }
 
 const UserDataContext = createContext<UserDataContext | null>(null);
@@ -38,7 +38,7 @@ export default function UserDataProvider({
   const [events, setEvents] = useState<Map<string, Event>>(Map());
   const [locations, setLocations] = useState<Map<string, Location>>(Map());
   const [following, setFollowing] = useState<Map<string, Friend>>(Map());
-  const [followers, setFollowers] = useState<Map<string, Friend>>(Map());
+  const [followers, setFollowers] = useState<Map<string, User>>(Map());
 
   useEffect(() => {
     (async () => {
@@ -49,7 +49,7 @@ export default function UserDataProvider({
             Event[],
             Location[],
             Friend[],
-            Friend[],
+            User[],
           ] = await Promise.all([
             fetch(C.ROUTES.yurbos(session.user.id), {
               cache: 'force-cache',

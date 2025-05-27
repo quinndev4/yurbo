@@ -14,7 +14,8 @@ const ROUTES = {
     `/api/${COLLECTIONS.USERS}/${id}/${COLLECTIONS.EVENTS}`,
   locations: (id?: string) =>
     `/api/${COLLECTIONS.USERS}/${id}/${COLLECTIONS.LOCATIONS}`,
-  friends: (id?: string) => `/api/${COLLECTIONS.USERS}/${id}/friends`,
+  friends: (id?: string) =>
+    `/api/${COLLECTIONS.USERS}/${id}/friends?query=following`,
   followers: (id?: string) =>
     `/api/${COLLECTIONS.USERS}/${id}/friends?query=followers`,
   following: (id?: string) =>

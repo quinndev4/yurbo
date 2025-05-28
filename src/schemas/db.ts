@@ -24,6 +24,10 @@ export const createYurboSchema = baseFormSchema
     location_id: z.string().optional(),
     event_id: z.string().min(1, 'Event is rquired'),
   });
+
+export const createFriendSchema = z.object({
+  email: z.string().email().min(3, 'Email is required'),
+});
 //   .refine(
 //     (data) =>
 //       data.location_id ||
@@ -49,3 +53,4 @@ export const createYurboSchema = baseFormSchema
 export const createLocationSchema = baseFormSchema.merge(coordinatesFormSchema);
 
 export type YurboFormData = z.infer<typeof createYurboSchema>;
+export type FriendFormData = z.infer<typeof createFriendSchema>;

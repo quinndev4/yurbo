@@ -1,6 +1,6 @@
 'use client';
 
-import { friendFormSchema, FriendFormData } from '@/types/forms';
+import { friendFormSchema, FriendFormData } from '@/schemas/db';
 import FormBuilder, { Field } from '@/components/FormBuilder';
 import { useUserData } from '@/components/UserDataProvider';
 import { Map } from 'immutable';
@@ -14,6 +14,8 @@ import { C } from '@/constants/constants';
 import { useSession } from 'next-auth/react';
 import { useParams } from 'next/navigation';
 import Button from '@/components/Button';
+import { useAction } from 'next-safe-action/hooks';
+import { createFriend } from '@/actions/db';
 
 export default function FriendsPage() {
   const { data: session } = useSession();
@@ -63,6 +65,30 @@ export default function FriendsPage() {
       }, 3000);
     }
   }, [success, errorMessage]);
+
+  // #####################
+  const { execute } = useAction(createFriend, {
+    onSuccess: ({ data }) => {
+      if (data?.user_followed.id) {
+      }
+
+      router.push('/');
+    },
+    onError: (res) => {
+      alert(
+        JSON.stringify(
+          { ...res.input, ...getErrorMessgaeSuccess(res.error) },
+          null,
+          2
+        )
+      );
+    },
+    onExecute: ({ input }) => {
+      console.log('Location submitting...', input);
+    },
+  });
+
+  // #####################
 
   const onSubmit = async (friendData: FriendFormData) => {
     setSubmitting(true);

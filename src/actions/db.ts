@@ -109,21 +109,19 @@ export const createFriend = authActionClient
 
       // check if user is found
       if (!followingDoc) {
-        return { success: false, message: ERRORS.FRIEND.NOTFOUND };
+        return { success: false, errorMessage: ERRORS.FRIEND.NOTFOUND };
       }
 
       // check if user is yourself
       if (followingDoc.id === session?.user?.id) {
-        return { success: false, message: ERRORS.FRIEND.YOURSELF };
+        return { success: false, errorMessage: ERRORS.FRIEND.YOURSELF };
       }
-
-      const created_at = serverTimestamp(); // When relationship starts
 
       const following: User = {
         id: followingDoc.id,
         name: followingDoc.data().name,
         email: followingDoc.data().email,
-        created_at: followingDoc.data().created_at,
+        created_at: Timestamp.now(),
       };
 
       console.log('Found user:', following);
@@ -140,7 +138,11 @@ export const createFriend = authActionClient
       )?.docs?.[0];
 
       if (existingRelationship) {
-        return { success: false, message: ERRORS.FRIEND.ALREADYEXISTS };
+        console.log(
+          'Existing relationship?',
+          JSON.stringify(existingRelationship.data())
+        );
+        return { success: false, errorMessage: ERRORS.FRIEND.ALREADYEXISTS };
       }
 
       // Add relationship to "Followers" collection
@@ -149,16 +151,15 @@ export const createFriend = authActionClient
         {
           user_id: following.id,
           follower_id: session?.user?.id,
-          created_at,
+          created_at: following.created_at,
         }
       );
+      console.log('Relationship now added');
       revalidatePath(C.ROUTES.following(session?.user?.id));
 
       // return successful response
       return {
-        message: LOGS.FRIEND.created(email),
-        success: true,
-        user_followed: following,
+        user_followed: { ...following },
       };
     } catch (error) {
       const errorMessage = getErrorMessage(error);
@@ -168,6 +169,6 @@ export const createFriend = authActionClient
         ERRORS.FRIEND.CREATED,
         JSON.stringify({ message: errorMessage, body })
       );
-      return { mesage: errorMessage, success: false, ...body };
+      return { errorMessage: errorMessage, success: false, ...body };
     }
   });

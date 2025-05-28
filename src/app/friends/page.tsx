@@ -1,6 +1,6 @@
 'use client';
 
-import { friendFormSchema, FriendFormData } from '@/schemas/db';
+import { createFriendSchema, FriendFormData } from '@/schemas/db';
 import FormBuilder, { Field } from '@/components/FormBuilder';
 import { useUserData } from '@/components/UserDataProvider';
 import { Map } from 'immutable';
@@ -29,6 +29,8 @@ export default function FriendsPage() {
   const [userFollowed, setUserFollowed] = useState<string | null | undefined>(
     null
   );
+
+  const [geoDefaults, setGeoDefaults] = useState<Partial<FriendFormData>>({});
 
   const getFollowing = async () => {
     const res = await fetch(C.ROUTES.following(session?.user?.id));
@@ -69,10 +71,21 @@ export default function FriendsPage() {
   // #####################
   const { execute } = useAction(createFriend, {
     onSuccess: ({ data }) => {
-      if (data?.user_followed.id) {
-      }
+      if (data?.errorMessage) {
+        console.log('JSON RESPONSE:', JSON.stringify(errorMessage));
 
-      router.push('/');
+        setErrorMessage(data?.errorMessage);
+        console.log(errorMessage);
+      } else if (data?.user_followed?.id) {
+        setErrorMessage(null);
+        setSuccess(true);
+        setUserFollowed(data?.user_followed?.name);
+
+        setFollowing((oldFollowing) =>
+          oldFollowing.set(data!.user_followed.id, data!.user_followed)
+        );
+      }
+      setSubmitting(false);
     },
     onError: (res) => {
       alert(
@@ -82,9 +95,11 @@ export default function FriendsPage() {
           2
         )
       );
+      setSubmitting(false);
     },
     onExecute: ({ input }) => {
-      console.log('Location submitting...', input);
+      setSubmitting(true);
+      console.log('Friend submitting...', input);
     },
   });
 
@@ -158,10 +173,13 @@ export default function FriendsPage() {
 
       <FormLayout title='Follow User'>
         <FormBuilder
-          schema={friendFormSchema}
+          schema={createFriendSchema}
           fields={fields}
-          onSubmit={onSubmit}
-          submitting={submitting}
+          execute={(a) => {
+            console.log('a', a);
+            execute(a);
+          }}
+          // submitting={submitting}
         />
         {errorMessage && (
           <div className='mt-4 rounded border border-red-400 bg-red-100 p-3 text-red-700'>

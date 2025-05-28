@@ -1,22 +1,46 @@
 'use client';
 
-import { locationFormSchema, LocationFormData } from '@/types/forms';
+import { useAction } from 'next-safe-action/hooks';
+
+import { createLocationSchema, LocationFormData } from '@/schemas/db';
 import FormBuilder, { Field } from '@/components/FormBuilder';
 import FormLayout from '@/components/FormLayout';
 import { useEffect, useState } from 'react';
-import { CreateLocationResponse } from '@/types/types';
 import { getErrorMessgaeSuccess } from '@/constants/errors';
 import { useRouter } from 'next/navigation';
-import { C } from '@/constants/constants';
-import { useSession } from 'next-auth/react';
 import { useUserData } from '@/components/UserDataProvider';
+import { createLocation } from '@/actions/db';
 
 export default function CreateLocationPage() {
-  const { data: session } = useSession();
-
   const router = useRouter();
 
   const { setLocations } = useUserData();
+
+  const { execute } = useAction(createLocation, {
+    onSuccess: ({ data }) => {
+      alert(JSON.stringify(data, null, 2));
+
+      if (data?.location.id) {
+        setLocations((oldEvents) =>
+          oldEvents.set(data.location.id, data.location)
+        );
+      }
+
+      router.push('/');
+    },
+    onError: (res) => {
+      alert(
+        JSON.stringify(
+          { ...res.input, ...getErrorMessgaeSuccess(res.error) },
+          null,
+          2
+        )
+      );
+    },
+    onExecute: ({ input }) => {
+      console.log('Location submitting...', input);
+    },
+  });
 
   const fields: Field[] = [
     { name: 'name', label: 'Name', type: 'text' },
@@ -26,9 +50,6 @@ export default function CreateLocationPage() {
   ];
 
   const [geoDefaults, setGeoDefaults] = useState<Partial<LocationFormData>>({});
-  const [submitting, setSubmitting] = useState(false);
-
-  console.log(geoDefaults);
 
   useEffect(() => {
     navigator.geolocation?.getCurrentPosition((position) => {
@@ -39,47 +60,13 @@ export default function CreateLocationPage() {
     });
   }, []);
 
-  const onSubmit = async (location: LocationFormData) => {
-    console.log('Location submitting...', location);
-
-    setSubmitting(true);
-
-    try {
-      const res = await fetch(C.ROUTES.locations(session?.user?.id), {
-        method: 'POST',
-        body: JSON.stringify(location),
-      });
-
-      const data: CreateLocationResponse = await res.json();
-
-      alert(JSON.stringify(data, null, 2));
-
-      setLocations((oldLocations) =>
-        oldLocations.set(data.location.id, data.location)
-      );
-
-      router.push('/');
-    } catch (error) {
-      alert(
-        JSON.stringify(
-          { ...location, ...getErrorMessgaeSuccess(error) },
-          null,
-          2
-        )
-      );
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
   return (
     <FormLayout title='Create Location'>
       <FormBuilder
-        schema={locationFormSchema}
+        schema={createLocationSchema}
         fields={fields}
-        onSubmit={onSubmit}
         defaultValues={geoDefaults} // dynamic geo values
-        submitting={submitting}
+        execute={execute}
       />
     </FormLayout>
   );

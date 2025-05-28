@@ -58,6 +58,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               ).id,
             };
 
+        console.log('hehyeye', userData);
+
         token.user = {
           ...user,
           created_at: Timestamp.now(),

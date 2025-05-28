@@ -4,7 +4,7 @@ import { friendFormSchema, FriendFormData } from '@/types/forms';
 import FormBuilder, { Field } from '@/components/FormBuilder';
 import { useUserData } from '@/components/UserDataProvider';
 import { Map } from 'immutable';
-import { Friend } from '@/types/types';
+import { Friend, User } from '@/types/types';
 import FormLayout from '@/components/FormLayout';
 import { useState, useEffect } from 'react';
 import { CreateFriendResponse } from '@/types/types';
@@ -14,11 +14,6 @@ import { C } from '@/constants/constants';
 import { useSession } from 'next-auth/react';
 import { useParams } from 'next/navigation';
 import Button from '@/components/Button';
-
-interface User {
-  id: string;
-  name: string;
-}
 
 export default function FriendsPage() {
   const { data: session } = useSession();
@@ -85,9 +80,6 @@ export default function FriendsPage() {
       if (!res.ok) {
         throw new Error('Failed to create new following');
       }
-
-      // alert(JSON.stringify(responseJson, null, 2));
-
       if (responseJson) {
         setFollowing((oldFollowing) =>
           oldFollowing.set(
@@ -104,17 +96,6 @@ export default function FriendsPage() {
       setUserFollowed(responseJson.user_followed.name);
     } catch (error) {
       console.log('JSON RESPONSE:', JSON.stringify(responseJson));
-      // alert(
-      //   JSON.stringify(
-      //     {
-      //       ...(responseJson ?? { message: 'No response received' }),
-      //       ...location,
-      //       ...getErrorMessgaeSuccess(error),
-      //     },
-      //     null,
-      //     2
-      //   )
-      // );
 
       setErrorMessage(responseJson?.message);
       console.log(errorMessage);
@@ -167,8 +148,8 @@ export default function FriendsPage() {
           </div>
         )}
       </FormLayout>
-      <Button onClick={getFollowers}>Get Followers</Button>
-      <Button onClick={getFollowing}>Get Following</Button>
+      {/* <Button onClick={getFollowers}>Get Followers</Button>
+      <Button onClick={getFollowing}>Get Following</Button> */}
     </>
   );
 }

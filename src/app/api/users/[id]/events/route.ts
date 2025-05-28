@@ -1,16 +1,8 @@
 import { firestore } from '@/firebase';
-import {
-  serverTimestamp,
-  collection,
-  query,
-  getDocs,
-  addDoc,
-} from 'firebase/firestore';
+import { collection, query, getDocs } from 'firebase/firestore';
 import { auth } from '@/auth';
 import { ERRORS, getErrorMessage } from '@/constants/errors';
 import { LOGS } from '@/constants/logs';
-import { NextRequest } from 'next/server';
-import { revalidatePath } from 'next/cache';
 import { C } from '@/constants/constants';
 
 export async function GET() {
@@ -53,68 +45,6 @@ export async function GET() {
     console.error(ERRORS.YURBO.GOT, JSON.stringify({ message: errorMessage }));
     return Response.json(
       { mesage: errorMessage, success: false },
-      { status: 500 }
-    );
-  }
-}
-
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const body = await request.json();
-
-  const { id } = await params;
-  const { name, description } = body;
-
-  try {
-    const session = await auth();
-
-    // no user found in session
-    if (!session?.user?.id || session.user.id !== id) {
-      return Response.json(
-        { success: false, mesage: ERRORS.UNATHORIZED },
-        { status: 401 }
-      );
-    }
-
-    // add new personal event
-    const res = await addDoc(
-      collection(
-        firestore,
-        C.COLLECTIONS.USERS,
-        session.user.id,
-        C.COLLECTIONS.EVENTS
-      ),
-      {
-        name,
-        ...(description && { description }),
-        created_at: serverTimestamp(),
-      }
-    );
-
-    revalidatePath(C.ROUTES.events(session.user.id));
-
-    // return successful response
-    console.log(LOGS.EVENT.CREATED, name);
-    return Response.json(
-      {
-        message: LOGS.EVENT.CREATED,
-        success: true,
-        event: { ...body, id: res.id },
-      },
-      { status: 200 }
-    );
-  } catch (error) {
-    const errorMessage = getErrorMessage(error);
-
-    // failure
-    console.error(
-      ERRORS.EVENT.CREATED,
-      JSON.stringify({ message: errorMessage, name, description })
-    );
-    return Response.json(
-      { mesage: errorMessage, success: false, name, description },
       { status: 500 }
     );
   }

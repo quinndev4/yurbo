@@ -4,10 +4,10 @@ import { SessionProvider } from 'next-auth/react';
 
 import { Inter } from 'next/font/google';
 import NavBar from '@/components/NavBar';
-import LoginPage from './LoginPage';
+import LoginPage from '../components/LoginPage';
 import UserDataProvider from '@/components/UserDataProvider';
 
-import './globals.css';
+import '@/styles/globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -40,10 +40,7 @@ export default async function RootLayout({
               </main>
             </UserDataProvider>
           ) : (
-            <div className='flex min-h-screen flex-col items-center justify-center gap-10'>
-              <h1 className='text-6xl'>Joe Hole</h1>
-              <LoginPage />
-            </div>
+            <LoginPage />
           )}
         </body>
       </html>

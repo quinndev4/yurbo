@@ -1,19 +1,66 @@
 'use client';
 
-import { yurboFormSchema, YurboFormData } from '@/types/forms';
+import { useAction } from 'next-safe-action/hooks';
+
+import { createYurboSchema, YurboFormData } from '@/schemas/db';
 import FormBuilder, { Field } from '@/components/FormBuilder';
 import FormLayout from '@/components/FormLayout';
 import { useEffect, useState } from 'react';
-import { CreateYurboResponse } from '@/types/types';
 import { getErrorMessgaeSuccess } from '@/constants/errors';
 import { useUserData } from '@/components/UserDataProvider';
-import { useSession } from 'next-auth/react';
-import { C } from '@/constants/constants';
+import { createYurbo } from '@/actions/db';
+import { useRouter } from 'next/navigation';
 
 export default function CreateYurboPage() {
-  const { data: session } = useSession();
+  const router = useRouter();
 
-  const { events, locations, setYurbos } = useUserData();
+  const { events, locations } = useUserData();
+
+  const { execute } = useAction(createYurbo, {
+    onSuccess: ({ data }) => {
+      alert(JSON.stringify(data, null, 2));
+
+      if (data?.yurbo.id) {
+        // const location =
+        // if ('location_id' in data.yurbo) {
+        //   const location = locations.get(data.yurbo.location_id)
+        // } else {
+        //   const a = data.yurbo;
+        //   setYurbos((oldEvents) => oldEvents.set(data.yurbo.id, a));
+        // }
+        // const yurbo = data.yurbo;
+        // if ('location_id' in yurbo) {
+        //   const a = yurbo
+        //   const location = locations.get(yurbo.location_id);
+        //   yurbo.lat = location?.lat || 1;
+        //   yurbo.long = location?.long || 1;
+        // } else {
+        //   const b = yurbo
+        // }
+        // setYurbos((oldEvents) => oldEvents.set(yurbo.id, yurbo));
+        // const location =
+        //   'location_id' in yurbo && locations.get(data.yurbo.location_id);
+        // const yurbo =
+        //   'location_id' in data.yurbo
+        //     ? { ...data.yurbo, lat: location.lat, long: location.long }
+        //     : data.yurbo;
+      }
+
+      router.push('/');
+    },
+    onError: (res) => {
+      alert(
+        JSON.stringify(
+          { ...res.input, ...getErrorMessgaeSuccess(res.error) },
+          null,
+          2
+        )
+      );
+    },
+    onExecute: ({ input }) => {
+      console.log('Location submitting...', input);
+    },
+  });
 
   const fields: Field[] = [
     { name: 'name', label: 'Name', type: 'text' },
@@ -41,7 +88,6 @@ export default function CreateYurboPage() {
   ];
 
   const [geoDefaults, setGeoDefaults] = useState<Partial<YurboFormData>>({});
-  const [submitting, setSubmitting] = useState(false);
 
   console.log(geoDefaults);
 
@@ -54,45 +100,16 @@ export default function CreateYurboPage() {
     });
   }, []);
 
-  const onSubmit = async (yurbo: YurboFormData) => {
-    console.log('Yurbo submitting...', yurbo);
-
-    setSubmitting(true);
-
-    try {
-      const res = await fetch(C.ROUTES.yurbos(session?.user?.id), {
-        method: 'POST',
-        body: JSON.stringify(yurbo),
-      });
-
-      const data: CreateYurboResponse = await res.json();
-
-      alert(JSON.stringify(data, null, 2));
-
-      const location = yurbo.location_id && locations.get(yurbo.location_id);
-
-      if (location) {
-        ({ lat: yurbo.lat, long: yurbo.long } = location);
-      }
-
-      setYurbos((oldYurbos) => oldYurbos.set(data.yurbo.id, data.yurbo));
-    } catch (error) {
-      alert(
-        JSON.stringify({ ...yurbo, ...getErrorMessgaeSuccess(error) }, null, 2)
-      );
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
   return (
     <FormLayout title='Create Yurbo'>
       <FormBuilder
-        schema={yurboFormSchema}
+        schema={createYurboSchema}
         fields={fields}
-        onSubmit={onSubmit}
         defaultValues={geoDefaults} // dynamic geo values
-        submitting={submitting}
+        execute={(a) => {
+          console.log('a', a);
+          execute(a);
+        }}
       />
     </FormLayout>
   );

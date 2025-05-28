@@ -1,10 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  useForm,
-  SubmitHandler,
-  FieldValues,
-  DefaultValues,
-} from 'react-hook-form';
+import { useForm, FieldValues, DefaultValues } from 'react-hook-form';
 import { ZodType } from 'zod';
 import Button from './Button';
 import { useEffect } from 'react';
@@ -19,22 +14,20 @@ export type Field = {
 interface FormBuilderProps<T extends FieldValues> {
   schema: ZodType<T>;
   fields: Field[];
-  onSubmit: SubmitHandler<T>;
+  execute: (input: T) => void;
   defaultValues?: DefaultValues<T>;
-  submitting: boolean;
 }
 
 export default function FormBuilder<T extends FieldValues>({
   schema,
   fields,
-  onSubmit,
+  execute,
   defaultValues,
-  submitting,
 }: FormBuilderProps<T>) {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
     reset,
   } = useForm<T>({ resolver: zodResolver(schema) });
 
@@ -46,7 +39,7 @@ export default function FormBuilder<T extends FieldValues>({
   }, [defaultValues, reset]);
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
+    <form onSubmit={handleSubmit(execute)} className='space-y-4'>
       {fields.map(({ name, label, type, options }) => (
         <div key={name}>
           <label className='mb-1'>{label}</label>
@@ -85,7 +78,7 @@ export default function FormBuilder<T extends FieldValues>({
       ))}
 
       <div className='mt-8 flex justify-end'>
-        <Button type='submit' disabled={submitting}>
+        <Button type='submit' disabled={isSubmitting}>
           Submit
         </Button>
       </div>

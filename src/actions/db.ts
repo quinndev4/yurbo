@@ -1,6 +1,8 @@
 'use server';
 
+import { auth } from '@/auth';
 import { C } from '@/constants/constants';
+import { ERRORS, getErrorMessage } from '@/constants/errors';
 import { LOGS } from '@/constants/logs';
 import { firestore } from '@/firebase';
 import { authActionClient } from '@/lib/safe-action';
@@ -8,12 +10,17 @@ import {
   createEventSchema,
   createLocationSchema,
   createYurboSchema,
+  createFriendSchema,
 } from '@/schemas/db';
+import { User } from '@/types/types';
 import {
   addDoc,
   collection,
+  getDocs,
+  query,
   serverTimestamp,
   Timestamp,
+  where,
 } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
 
@@ -80,4 +87,88 @@ export const createYurbo = authActionClient
     console.log(LOGS.YURBO.CREATED, parsedInput.name, id);
 
     return { yurbo: { id, ...parsedInput, created_at: Timestamp.now() } };
+  });
+
+export const createFriend = authActionClient
+  .schema(createFriendSchema)
+  .action(async ({ parsedInput: { email }, ctx: { userId } }) => {
+    const body = { email };
+
+    const session = await auth();
+
+    try {
+      // Get following's info
+      const followingDoc = (
+        await getDocs(
+          query(
+            collection(firestore, C.COLLECTIONS.USERS),
+            where('email', '==', email)
+          )
+        )
+      )?.docs?.[0];
+
+      // check if user is found
+      if (!followingDoc) {
+        return { success: false, errorMessage: ERRORS.FRIEND.NOTFOUND };
+      }
+
+      // check if user is yourself
+      if (followingDoc.id === session?.user?.id) {
+        return { success: false, errorMessage: ERRORS.FRIEND.YOURSELF };
+      }
+
+      const following: User = {
+        id: followingDoc.id,
+        name: followingDoc.data().name,
+        email: followingDoc.data().email,
+        created_at: Timestamp.now(),
+      };
+
+      console.log('Found user:', following);
+
+      // check if user already follows this head
+      const existingRelationship = (
+        await getDocs(
+          query(
+            collection(firestore, C.COLLECTIONS.FOLLOWERS),
+            where('follower_id', '==', session?.user?.id),
+            where('user_id', '==', following.id)
+          )
+        )
+      )?.docs?.[0];
+
+      if (existingRelationship) {
+        console.log(
+          'Existing relationship?',
+          JSON.stringify(existingRelationship.data())
+        );
+        return { success: false, errorMessage: ERRORS.FRIEND.ALREADYEXISTS };
+      }
+
+      // Add relationship to "Followers" collection
+      const followFriendRes = await addDoc(
+        collection(firestore, C.COLLECTIONS.FOLLOWERS),
+        {
+          user_id: following.id,
+          follower_id: session?.user?.id,
+          created_at: following.created_at,
+        }
+      );
+      console.log('Relationship now added');
+      revalidatePath(C.ROUTES.following(session?.user?.id));
+
+      // return successful response
+      return {
+        user_followed: { ...following },
+      };
+    } catch (error) {
+      const errorMessage = getErrorMessage(error);
+
+      // failure
+      console.error(
+        ERRORS.FRIEND.CREATED,
+        JSON.stringify({ message: errorMessage, body })
+      );
+      return { errorMessage: errorMessage, success: false, ...body };
+    }
   });

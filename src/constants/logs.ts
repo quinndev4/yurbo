@@ -14,4 +14,8 @@ export const LOGS = {
     CREATED: 'Location successfully created',
     GOT: 'Locations successfully retrieved',
   },
+  FRIEND: {
+    created: (email: string) => `Friend (${email}) successfully created`,
+    GOT: 'Following successfully retrieved',
+  },
 };

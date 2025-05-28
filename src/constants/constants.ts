@@ -4,6 +4,7 @@ const COLLECTIONS = {
   YURBOS: 'yurbos',
   EVENTS: 'events',
   LOCATIONS: 'locations',
+  FOLLOWERS: 'followers',
 };
 
 const ROUTES = {
@@ -13,6 +14,12 @@ const ROUTES = {
     `/api/${COLLECTIONS.USERS}/${id}/${COLLECTIONS.EVENTS}`,
   locations: (id?: string) =>
     `/api/${COLLECTIONS.USERS}/${id}/${COLLECTIONS.LOCATIONS}`,
+  friends: (id?: string) =>
+    `/api/${COLLECTIONS.USERS}/${id}/friends?query=following`,
+  followers: (id?: string) =>
+    `/api/${COLLECTIONS.USERS}/${id}/friends?query=followers`,
+  following: (id?: string) =>
+    `/api/${COLLECTIONS.USERS}/${id}/friends?query=following`,
 };
 
 export const C = { COLLECTIONS, ROUTES };

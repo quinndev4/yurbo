@@ -7,13 +7,13 @@ import FormBuilder, { Field } from '@/components/FormBuilder';
 import FormLayout from '@/components/FormLayout';
 import { useRouter } from 'next/navigation';
 import { getErrorMessgaeSuccess } from '@/constants/errors';
-import { useUserData } from '@/providers/UserProvider';
+import { useUser } from '@/providers/UserProvider';
 import { createEvent } from '@/actions/db';
 
 export default function CreateEventPage() {
   const router = useRouter();
 
-  const { setEvents } = useUserData();
+  const { setEvents } = useUser();
 
   const { execute } = useAction(createEvent, {
     onSuccess: ({ data }) => {

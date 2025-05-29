@@ -1,6 +1,6 @@
 import { auth } from '@/auth';
 import { ERRORS, getErrorMessage } from '@/constants/errors';
-import { collection, getDocs, query } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import { firestore } from '@/firebase';
 import { User } from '@/types/types';
 import { C } from '@/constants/constants';
@@ -15,16 +15,9 @@ export async function getUser(id: string): Promise<User> {
     }
 
     // get all records where user is the follower
-    const userDoc = (
-      await getDocs(query(collection(firestore, C.COLLECTIONS.FOLLOWERS, id)))
-    ).docs?.[0];
+    const userDoc = await getDoc(doc(firestore, C.COLLECTIONS.USERS, id));
 
-    return {
-      id: userDoc.id,
-      name: userDoc.data().name,
-      email: userDoc.data().email,
-      created_at: userDoc.data().created_at,
-    };
+    return { id: userDoc.id, ...userDoc.data() } as User;
   } catch (error) {
     const errorMessage = getErrorMessage(error);
 

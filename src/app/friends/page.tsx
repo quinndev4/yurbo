@@ -2,7 +2,7 @@
 
 import { createFriendSchema, FriendFormData } from '@/schemas/db';
 import FormBuilder, { Field } from '@/components/FormBuilder';
-import { useUserData } from '@/providers/UserProvider';
+import { useUser } from '@/providers/UserProvider';
 import { Map } from 'immutable';
 import { Friend, User } from '@/types/types';
 import FormLayout from '@/components/FormLayout';
@@ -20,7 +20,7 @@ import { createFriend } from '@/actions/db';
 export default function FriendsPage() {
   const { data: session } = useSession();
 
-  const { following, followers, setFollowers, setFollowing } = useUserData();
+  const { following, followers, setFollowers, setFollowing } = useUser();
   const [errorMessage, setErrorMessage] = useState<string | null | undefined>(
     null
   );

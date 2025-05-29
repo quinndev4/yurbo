@@ -1,12 +1,12 @@
 import { auth } from '@/auth';
 import { ERRORS, getErrorMessage } from '@/constants/errors';
-import { collection, getDocs, orderBy, query, where } from 'firebase/firestore';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import { firestore } from '@/firebase';
 import { LOGS } from '@/constants/logs';
 import { Friend, User } from '@/types/types';
 import { C } from '@/constants/constants';
 
-export async function getFollowers(): Promise<User[]> {
+export async function getFollowers(id: string): Promise<User[]> {
   try {
     const session = await auth();
 
@@ -19,7 +19,7 @@ export async function getFollowers(): Promise<User[]> {
     const followers_snapshot = await getDocs(
       query(
         collection(firestore, C.COLLECTIONS.FOLLOWERS),
-        where('user_id', '==', session?.user?.id)
+        where('user_id', '==', id)
         // orderBy('created_at', 'desc')
       )
     );

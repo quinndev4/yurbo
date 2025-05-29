@@ -6,59 +6,81 @@ import { useEffect } from 'react';
 import { Map } from 'immutable';
 
 import { useSelectedUser } from '@/providers/SelectedUserProvider';
-import { useUserData } from '@/providers/UserProvider';
+import { useUser } from '@/providers/UserProvider';
 import type { Event, Location, Yurbo, User } from '@/types/types';
 import { C } from '@/constants/constants';
 
-export default function UserLayout() {
+export default function UserLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const params = useParams();
 
   const { data: session } = useSession();
 
-  const { yurbos, locations, events, followers, following } = useUserData();
+  const { yurbos, locations, events, followers, following } = useUser();
 
-  const { setYurbos, setEvents, setLocations, setFollowers, setFollowing } =
-    useSelectedUser();
+  const {
+    setUser,
+    setYurbos,
+    setEvents,
+    setLocations,
+    setFollowers,
+    setFollowing,
+  } = useSelectedUser();
 
   useEffect(() => {
+    const userId = params.userId as string;
+
     const fetchSelectedData = async () => {
+      console.log('start');
       try {
         if (session?.user?.id) {
-          const [yurbos, events, locations, following, followers]: [
+          console.log('in', userId);
+
+          const [user, yurbos, events, locations, following, followers]: [
+            User,
             Yurbo[],
             Event[],
             Location[],
             User[],
             User[],
           ] = await Promise.all([
-            fetch(C.ROUTES.yurbos(session.user.id), {
+            fetch(C.ROUTES.user(userId), {
+              cache: 'force-cache',
+            })
+              .then((res) => res.json())
+              .then((res) => res.user),
+            fetch(C.ROUTES.yurbos(userId), {
               cache: 'force-cache',
             })
               .then((res) => res.json())
               .then((res) => res.yurbos),
-            fetch(C.ROUTES.events(session.user.id), {
+            fetch(C.ROUTES.events(userId), {
               cache: 'force-cache',
             })
               .then((res) => res.json())
               .then((res) => res.events),
-            fetch(C.ROUTES.locations(session.user.id), {
+            fetch(C.ROUTES.locations(userId), {
               cache: 'force-cache',
             })
               .then((res) => res.json())
               .then((res) => res.locations),
-            fetch(C.ROUTES.following(session.user.id), {
+            fetch(C.ROUTES.following(userId), {
               cache: 'force-cache',
             })
               .then((res) => res.json())
               .then((res) => res.ret),
-            fetch(C.ROUTES.followers(session.user.id), {
+            fetch(C.ROUTES.followers(userId), {
               cache: 'force-cache',
             })
               .then((res) => res.json())
               .then((res) => res.ret),
           ]);
 
-          console.log('selected user data', {
+          console.log('selected user data', userId, {
+            user,
             yurbos,
             events,
             locations,
@@ -92,6 +114,7 @@ export default function UserLayout() {
             followers.map((follower) => [follower.id, follower])
           );
 
+          setUser(user);
           setYurbos(yurboMap);
           setEvents(eventMap);
           setLocations(locationMap);
@@ -103,23 +126,38 @@ export default function UserLayout() {
       }
     };
 
-    if (session?.user?.id && session.user.id !== params.userId) {
-      fetchSelectedData();
-    } else {
-      setYurbos(yurbos);
-      setEvents(events);
-      setLocations(locations);
-      setFollowers(followers);
-      setFollowing(following);
+    if (session?.user?.id) {
+      console.log('yes', window.location.pathname, userId);
+
+      if (userId === 'me') {
+        window.history.replaceState(
+          null,
+          '',
+          window.location.pathname.replace('me', session.user.id)
+        );
+      }
+
+      if (!['me', session.user.id].includes(userId)) {
+        console.log('heyyy??');
+        fetchSelectedData();
+      } else {
+        setUser(session.user as User);
+        setYurbos(yurbos);
+        setEvents(events);
+        setLocations(locations);
+        setFollowers(followers);
+        setFollowing(following);
+      }
     }
   }, [
-    session?.user?.id,
+    session?.user,
     params.userId,
     yurbos,
     events,
     locations,
     followers,
     following,
+    setUser,
     setYurbos,
     setEvents,
     setLocations,
@@ -127,5 +165,5 @@ export default function UserLayout() {
     setFollowing,
   ]);
 
-  return <div>layout</div>;
+  return children;
 }

@@ -8,13 +8,13 @@ import FormLayout from '@/components/FormLayout';
 import { useEffect, useState } from 'react';
 import { getErrorMessgaeSuccess } from '@/constants/errors';
 import { useRouter } from 'next/navigation';
-import { useUserData } from '@/providers/UserProvider';
+import { useUser } from '@/providers/UserProvider';
 import { createLocation } from '@/actions/db';
 
 export default function CreateLocationPage() {
   const router = useRouter();
 
-  const { setLocations } = useUserData();
+  const { setLocations } = useUser();
 
   const { execute } = useAction(createLocation, {
     onSuccess: ({ data }) => {

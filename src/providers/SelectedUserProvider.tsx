@@ -20,7 +20,7 @@ const SelectedUserContext = createContext<SelectedUserContext | null>(null);
 export const useSelectedUser = () => {
   const context = useContext(SelectedUserContext);
   if (context === null)
-    throw new Error('useUserData must be used within a UserProvider');
+    throw new Error('useUser must be used within a UserProvider');
   return context;
 };
 

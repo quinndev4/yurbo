@@ -3,9 +3,19 @@ import { collection, getDocs, query } from 'firebase/firestore';
 import { firestore } from '@/firebase';
 import { ERRORS, getErrorMessage } from '@/constants/errors';
 import { C } from '@/constants/constants';
+import { NextRequest } from 'next/server';
 
-export async function GET() {
+export async function GET(
+  request: NextRequest,
+  {
+    params,
+  }: {
+    params: Promise<{ id: string }>;
+  }
+) {
   try {
+    const { id } = await params;
+
     const session = await auth();
 
     // no user found in session
@@ -16,12 +26,7 @@ export async function GET() {
     // get locations for this user
     const personal_locations = await getDocs(
       query(
-        collection(
-          firestore,
-          C.COLLECTIONS.USERS,
-          session.user.id,
-          C.COLLECTIONS.LOCATIONS
-        )
+        collection(firestore, C.COLLECTIONS.USERS, id, C.COLLECTIONS.LOCATIONS)
       )
     );
 

@@ -10,8 +10,8 @@ export default function UserProfilePage() {
     <div className='flex flex-col items-center gap-4'>
       <h1 className='text-6xl'>Profile</h1>
 
-      <h2 className='text-3xl'>{user?.name}</h2>
-      <h2 className='text-3xl'>{user?.email}</h2>
+      <h2 className='text-3xl'>Name: {user?.name}</h2>
+      <h2 className='text-3xl'>Email: {user?.email}</h2>
 
       <h2 className='text-xl'>Yurbos: {yurbos.size}</h2>
       <h2 className='text-xl'>Events: {events.size}</h2>

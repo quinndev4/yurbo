@@ -2,13 +2,13 @@
 
 import { auth } from '@/auth';
 import { ERRORS, getErrorMessage } from '@/constants/errors';
-import { collection, getDocs, orderBy, query } from 'firebase/firestore';
+import { collection, getDocs, query } from 'firebase/firestore';
 import { firestore } from '@/firebase';
 import { LOGS } from '@/constants/logs';
 import { Yurbo } from '@/types/types';
 import { C } from '@/constants/constants';
 
-export async function getYurbos(): Promise<Yurbo[]> {
+export async function getYurbos(id: string): Promise<Yurbo[]> {
   try {
     const session = await auth();
 
@@ -20,13 +20,7 @@ export async function getYurbos(): Promise<Yurbo[]> {
     // get yurbos for this user
     const yurbo_snapshot = await getDocs(
       query(
-        collection(
-          firestore,
-          C.COLLECTIONS.USERS,
-          session.user.id,
-          C.COLLECTIONS.YURBOS
-        )
-        // orderBy('created_at', 'desc')
+        collection(firestore, C.COLLECTIONS.USERS, id, C.COLLECTIONS.YURBOS)
       )
     );
 
@@ -35,7 +29,7 @@ export async function getYurbos(): Promise<Yurbo[]> {
     });
 
     // return successful response
-    console.log(LOGS.YURBO.GOT, session.user.email, yurbos, Date.now());
+    console.log(LOGS.YURBO.GOT, id, yurbos, Date.now());
 
     return yurbos;
   } catch (error) {

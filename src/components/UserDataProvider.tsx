@@ -2,7 +2,7 @@
 
 import { Map } from 'immutable';
 import { C } from '@/constants/constants';
-import { Event, Location, Yurbo, Friend, User } from '@/types/types';
+import { Event, Location, Yurbo, User } from '@/types/types';
 import { useSession } from 'next-auth/react';
 import { createContext, useContext, useEffect, useState } from 'react';
 

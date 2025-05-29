@@ -20,6 +20,7 @@ const ROUTES = {
     `/api/${COLLECTIONS.USERS}/${id}/friends?query=followers`,
   following: (id?: string) =>
     `/api/${COLLECTIONS.USERS}/${id}/friends?query=following`,
+  user: (id?: string) => `/api/${COLLECTIONS.USERS}/${id}/user`,
 };
 
 export const C = { COLLECTIONS, ROUTES };

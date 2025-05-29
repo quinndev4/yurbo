@@ -116,13 +116,7 @@ export async function POST(request: NextRequest) {
 
     // check if user already follows this head
     const existingRelationship = (
-      await getDocs(
-        query(
-          collection(firestore, C.COLLECTIONS.FOLLOWERS),
-          where('follower_id', '==', session?.user?.id),
-          where('user_id', '==', following.id)
-        )
-      )
+      await getDocs(query(collection(firestore, C.COLLECTIONS.FOLLOWERS), id))
     )?.docs?.[0];
 
     if (existingRelationship) {

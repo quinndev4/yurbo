@@ -9,9 +9,19 @@ export default async function NavBar() {
       <Link className='mx-4 text-3xl font-bold hover:cursor-pointer' href='/'>
         Yurbo
       </Link>
+      <div className='flex'>
+        <div>
+          <Link
+            className='mx-4 text-xl font-bold hover:cursor-pointer'
+            href='/me/profile'
+          >
+            Profile
+          </Link>
+        </div>
 
-      <div className='mx-4'>
-        <SignOutButton />
+        <div className='mx-4'>
+          <SignOutButton />
+        </div>
       </div>
     </header>
   );

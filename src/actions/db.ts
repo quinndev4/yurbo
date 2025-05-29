@@ -1,6 +1,5 @@
 'use server';
 
-import { auth } from '@/auth';
 import { C } from '@/constants/constants';
 import { ERRORS, getErrorMessage } from '@/constants/errors';
 import { LOGS } from '@/constants/logs';
@@ -94,8 +93,6 @@ export const createFriend = authActionClient
   .action(async ({ parsedInput: { email }, ctx: { userId } }) => {
     const body = { email };
 
-    const session = await auth();
-
     try {
       // Get following's info
       const followingDoc = (
@@ -113,7 +110,7 @@ export const createFriend = authActionClient
       }
 
       // check if user is yourself
-      if (followingDoc.id === session?.user?.id) {
+      if (followingDoc.id === userId) {
         return { success: false, errorMessage: ERRORS.FRIEND.YOURSELF };
       }
 
@@ -131,7 +128,7 @@ export const createFriend = authActionClient
         await getDocs(
           query(
             collection(firestore, C.COLLECTIONS.FOLLOWERS),
-            where('follower_id', '==', session?.user?.id),
+            where('follower_id', '==', userId),
             where('user_id', '==', following.id)
           )
         )
@@ -146,16 +143,13 @@ export const createFriend = authActionClient
       }
 
       // Add relationship to "Followers" collection
-      const followFriendRes = await addDoc(
-        collection(firestore, C.COLLECTIONS.FOLLOWERS),
-        {
-          user_id: following.id,
-          follower_id: session?.user?.id,
-          created_at: following.created_at,
-        }
-      );
+      await addDoc(collection(firestore, C.COLLECTIONS.FOLLOWERS), {
+        user_id: following.id,
+        follower_id: userId,
+        created_at: following.created_at,
+      });
       console.log('Relationship now added');
-      revalidatePath(C.ROUTES.following(session?.user?.id));
+      revalidatePath(C.ROUTES.following(userId));
 
       // return successful response
       return {

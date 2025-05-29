@@ -1,5 +1,6 @@
 import { Timestamp } from 'firebase/firestore';
 import { NextRequest } from 'next/server';
+import { Map } from 'immutable';
 
 type Never<T> = {
   [K in keyof T]?: never;
@@ -125,4 +126,17 @@ declare interface User {
   name: string;
   email: string;
   created_at: Timestamp;
+}
+
+interface UserDataContext {
+  yurbos: Map<string, Yurbo>;
+  setYurbos: React.Dispatch<React.SetStateAction<Map<string, Yurbo>>>;
+  events: Map<string, Event>;
+  setEvents: React.Dispatch<React.SetStateAction<Map<string, Event>>>;
+  locations: Map<string, Location>;
+  setLocations: React.Dispatch<React.SetStateAction<Map<string, Location>>>;
+  following: Map<string, User>;
+  setFollowing: React.Dispatch<React.SetStateAction<Map<string, User>>>;
+  followers: Map<string, User>;
+  setFollowers: React.Dispatch<React.SetStateAction<Map<string, User>>>;
 }

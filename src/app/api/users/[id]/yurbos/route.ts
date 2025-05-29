@@ -1,9 +1,19 @@
 import { ERRORS, getErrorMessage } from '@/constants/errors';
 import { getYurbos } from '@/actions/getYurbos';
+import { NextRequest } from 'next/server';
 
-export async function GET() {
+export async function GET(
+  request: NextRequest,
+  {
+    params,
+  }: {
+    params: Promise<{ id: string }>;
+  }
+) {
   try {
-    const yurbos = await getYurbos();
+    const { id } = await params;
+
+    const yurbos = await getYurbos(id);
 
     return Response.json({ yurbos });
   } catch (error) {

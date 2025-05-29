@@ -1,84 +1,86 @@
 'use client';
 
-import { Map } from 'immutable';
-import { C } from '@/constants/constants';
-import { Event, Location, Yurbo, User } from '@/types/types';
 import { useSession } from 'next-auth/react';
-import { createContext, useContext, useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
+import { useEffect } from 'react';
+import { Map } from 'immutable';
 
-interface UserDataContext {
-  yurbos: Map<string, Yurbo>;
-  setYurbos: React.Dispatch<React.SetStateAction<Map<string, Yurbo>>>;
-  events: Map<string, Event>;
-  setEvents: React.Dispatch<React.SetStateAction<Map<string, Event>>>;
-  locations: Map<string, Location>;
-  setLocations: React.Dispatch<React.SetStateAction<Map<string, Location>>>;
-  following: Map<string, User>;
-  setFollowing: React.Dispatch<React.SetStateAction<Map<string, User>>>;
-  followers: Map<string, User>;
-  setFollowers: React.Dispatch<React.SetStateAction<Map<string, User>>>;
-}
+import { useSelectedUser } from '@/providers/SelectedUserProvider';
+import { useUser } from '@/providers/UserProvider';
+import type { Event, Location, Yurbo, User } from '@/types/types';
+import { C } from '@/constants/constants';
 
-const UserDataContext = createContext<UserDataContext | null>(null);
-
-export const useUserData = () => {
-  const context = useContext(UserDataContext);
-  if (context === null)
-    throw new Error('useUserData must be used within a UserDataProvider');
-  return context;
-};
-
-export default function UserDataProvider({
+export default function UserLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const params = useParams();
+
   const { data: session } = useSession();
-  const [yurbos, setYurbos] = useState<Map<string, Yurbo>>(Map());
-  const [events, setEvents] = useState<Map<string, Event>>(Map());
-  const [locations, setLocations] = useState<Map<string, Location>>(Map());
-  const [following, setFollowing] = useState<Map<string, User>>(Map());
-  const [followers, setFollowers] = useState<Map<string, User>>(Map());
+
+  const { yurbos, locations, events, followers, following } = useUser();
+
+  const {
+    setUser,
+    setYurbos,
+    setEvents,
+    setLocations,
+    setFollowers,
+    setFollowing,
+  } = useSelectedUser();
 
   useEffect(() => {
-    (async () => {
+    const userId = params.userId as string;
+
+    const fetchSelectedData = async () => {
+      console.log('start');
       try {
         if (session?.user?.id) {
-          const [yurbos, events, locations, following, followers]: [
+          console.log('in', userId);
+
+          const [user, yurbos, events, locations, following, followers]: [
+            User,
             Yurbo[],
             Event[],
             Location[],
             User[],
             User[],
           ] = await Promise.all([
-            fetch(C.ROUTES.yurbos(session.user.id), {
+            fetch(C.ROUTES.user(userId), {
+              cache: 'force-cache',
+            })
+              .then((res) => res.json())
+              .then((res) => res.user),
+            fetch(C.ROUTES.yurbos(userId), {
               cache: 'force-cache',
             })
               .then((res) => res.json())
               .then((res) => res.yurbos),
-            fetch(C.ROUTES.events(session.user.id), {
+            fetch(C.ROUTES.events(userId), {
               cache: 'force-cache',
             })
               .then((res) => res.json())
               .then((res) => res.events),
-            fetch(C.ROUTES.locations(session.user.id), {
+            fetch(C.ROUTES.locations(userId), {
               cache: 'force-cache',
             })
               .then((res) => res.json())
               .then((res) => res.locations),
-            fetch(C.ROUTES.following(session.user.id), {
+            fetch(C.ROUTES.following(userId), {
               cache: 'force-cache',
             })
               .then((res) => res.json())
               .then((res) => res.ret),
-            fetch(C.ROUTES.followers(session.user.id), {
+            fetch(C.ROUTES.followers(userId), {
               cache: 'force-cache',
             })
               .then((res) => res.json())
               .then((res) => res.ret),
           ]);
 
-          console.log('user data', {
+          console.log('selected user data', userId, {
+            user,
             yurbos,
             events,
             locations,
@@ -112,6 +114,7 @@ export default function UserDataProvider({
             followers.map((follower) => [follower.id, follower])
           );
 
+          setUser(user);
           setYurbos(yurboMap);
           setEvents(eventMap);
           setLocations(locationMap);
@@ -121,25 +124,46 @@ export default function UserDataProvider({
       } catch (error) {
         console.error('Failed to fetch user data', error);
       }
-    })();
-  }, [session?.user?.id]);
+    };
 
-  return (
-    <UserDataContext.Provider
-      value={{
-        yurbos,
-        setYurbos,
-        events,
-        setEvents,
-        locations,
-        setLocations,
-        following,
-        setFollowing,
-        followers,
-        setFollowers,
-      }}
-    >
-      {children}
-    </UserDataContext.Provider>
-  );
+    if (session?.user?.id) {
+      console.log('yes', window.location.pathname, userId);
+
+      if (userId === 'me') {
+        window.history.replaceState(
+          null,
+          '',
+          window.location.pathname.replace('me', session.user.id)
+        );
+      }
+
+      if (!['me', session.user.id].includes(userId)) {
+        console.log('heyyy??');
+        fetchSelectedData();
+      } else {
+        setUser(session.user as User);
+        setYurbos(yurbos);
+        setEvents(events);
+        setLocations(locations);
+        setFollowers(followers);
+        setFollowing(following);
+      }
+    }
+  }, [
+    session?.user,
+    params.userId,
+    yurbos,
+    events,
+    locations,
+    followers,
+    following,
+    setUser,
+    setYurbos,
+    setEvents,
+    setLocations,
+    setFollowers,
+    setFollowing,
+  ]);
+
+  return children;
 }

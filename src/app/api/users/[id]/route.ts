@@ -1,9 +1,6 @@
 import { getErrorMessage } from '@/constants/errors';
 import { getUser } from '@/app/actions/getUser';
 import { NextRequest } from 'next/server';
-import { C } from '@/constants/constants';
-import { firestore } from '../../../../../firebase';
-import { User } from '@/types/types';
 
 export async function GET(
   request: NextRequest,
@@ -19,9 +16,9 @@ export async function GET(
   try {
     console.log(`Searching for user with id ${id}.`);
 
-    const ret = await getUser(id);
+    const user = await getUser(id);
 
-    return Response.json({ ret });
+    return Response.json({ user });
   } catch (error) {
     const errorMessage = getErrorMessage(error);
 

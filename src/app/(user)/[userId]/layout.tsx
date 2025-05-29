@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import { Map } from 'immutable';
 
 import { useSelectedUser } from '@/providers/SelectedUserProvider';
-import { useUserData } from '@/providers/UserDataProvider';
+import { useUserData } from '@/providers/UserProvider';
 import type { Event, Location, Yurbo, User } from '@/types/types';
 import { C } from '@/constants/constants';
 
@@ -126,5 +126,6 @@ export default function UserLayout() {
     setFollowers,
     setFollowing,
   ]);
+
   return <div>layout</div>;
 }

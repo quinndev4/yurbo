@@ -10,12 +10,17 @@ import type {
 } from '@/types/types';
 import { createContext, useContext, useState } from 'react';
 
-const SelectedUserContext = createContext<UserDataContext | null>(null);
+interface SelectedUserContext extends UserDataContext {
+  user: User | undefined;
+  setUser: React.Dispatch<React.SetStateAction<User | undefined>>;
+}
+
+const SelectedUserContext = createContext<SelectedUserContext | null>(null);
 
 export const useSelectedUser = () => {
   const context = useContext(SelectedUserContext);
   if (context === null)
-    throw new Error('useUserData must be used within a UserDataProvider');
+    throw new Error('useUserData must be used within a UserProvider');
   return context;
 };
 
@@ -24,6 +29,7 @@ export default function SelectedUserProvider({
 }: {
   children: React.ReactNode;
 }) {
+  const [user, setUser] = useState<User | undefined>();
   const [yurbos, setYurbos] = useState<Map<string, Yurbo>>(Map());
   const [events, setEvents] = useState<Map<string, Event>>(Map());
   const [locations, setLocations] = useState<Map<string, Location>>(Map());
@@ -33,6 +39,8 @@ export default function SelectedUserProvider({
   return (
     <SelectedUserContext.Provider
       value={{
+        user,
+        setUser,
         yurbos,
         setYurbos,
         events,

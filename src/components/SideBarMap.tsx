@@ -24,12 +24,12 @@ import {
   MapPinIcon,
   FireIcon,
 } from '@heroicons/react/24/outline';
-import { yurbos } from '@/mocks/yurbos';
+import { Map } from 'immutable';
 
 const MAX_ZOOM_LEVEL = 9;
 const NO_CLUSTER = 13;
 
-const MapWithSidebar = () => {
+const MapWithSidebar = ({ yurbos }: { yurbos: Map<string, Yurbo> }) => {
   const mapRef = useRef<MapRef>(null);
 
   const [mapType, setMapType] = useState<'heat' | 'cluster'>('heat');

@@ -8,7 +8,7 @@ import FormLayout from '@/components/FormLayout';
 import { useEffect, useState } from 'react';
 import { getErrorMessgaeSuccess } from '@/constants/errors';
 import { useRouter } from 'next/navigation';
-import { useUserData } from '@/providers/UserDataProvider';
+import { useUserData } from '@/providers/UserProvider';
 import { createLocation } from '@/actions/db';
 
 export default function CreateLocationPage() {

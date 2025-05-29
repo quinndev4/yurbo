@@ -12,16 +12,16 @@ import type {
 import { useSession } from 'next-auth/react';
 import { createContext, useContext, useEffect, useState } from 'react';
 
-const UserDataContext = createContext<UserDataContext | null>(null);
+const UserContext = createContext<UserDataContext | null>(null);
 
-export const useUserData = () => {
-  const context = useContext(UserDataContext);
+export const useUser = () => {
+  const context = useContext(UserContext);
   if (context === null)
-    throw new Error('useUserData must be used within a UserDataProvider');
+    throw new Error('useUserData must be used within a UserProvider');
   return context;
 };
 
-export default function UserDataProvider({
+export default function UserProvider({
   children,
 }: {
   children: React.ReactNode;
@@ -118,7 +118,7 @@ export default function UserDataProvider({
   }, [session?.user?.id]);
 
   return (
-    <UserDataContext.Provider
+    <UserContext.Provider
       value={{
         yurbos,
         setYurbos,
@@ -133,6 +133,6 @@ export default function UserDataProvider({
       }}
     >
       {children}
-    </UserDataContext.Provider>
+    </UserContext.Provider>
   );
 }

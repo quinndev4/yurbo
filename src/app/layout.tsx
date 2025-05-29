@@ -5,7 +5,7 @@ import { SessionProvider } from 'next-auth/react';
 import { Inter } from 'next/font/google';
 import NavBar from '@/components/NavBar';
 import LoginPage from '../components/LoginPage';
-import UserDataProvider from '@/providers/UserDataProvider';
+import UserProvider from '@/providers/UserProvider';
 
 import '@/styles/globals.css';
 
@@ -33,12 +33,12 @@ export default async function RootLayout({
           className={`${inter.className} bg-primary-light text-primary-dark dark:bg-primary-dark dark:text-primary-light flex h-full min-h-screen flex-col`}
         >
           {session?.user ? (
-            <UserDataProvider>
+            <UserProvider>
               <NavBar />
               <main className='flex flex-grow justify-center pt-20'>
                 {children}
               </main>
-            </UserDataProvider>
+            </UserProvider>
           ) : (
             <LoginPage />
           )}

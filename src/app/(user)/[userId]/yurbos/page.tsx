@@ -6,5 +6,5 @@ import { useSelectedUser } from '@/providers/SelectedUserProvider';
 export default function UserYurbosPage() {
   const { yurbos } = useSelectedUser();
 
-  return <MapWithSidebar />;
+  return <MapWithSidebar yurbos={yurbos} />;
 }

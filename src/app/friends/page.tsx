@@ -2,7 +2,7 @@
 
 import { createFriendSchema, FriendFormData } from '@/schemas/db';
 import FormBuilder, { Field } from '@/components/FormBuilder';
-import { useUserData } from '@/components/UserDataProvider';
+import { useUserData } from '@/providers/UserDataProvider';
 import { Map } from 'immutable';
 import { Friend, User } from '@/types/types';
 import FormLayout from '@/components/FormLayout';

@@ -5,7 +5,7 @@ import { SessionProvider } from 'next-auth/react';
 import { Inter } from 'next/font/google';
 import NavBar from '@/components/NavBar';
 import LoginPage from '../components/LoginPage';
-import UserDataProvider from '@/components/UserDataProvider';
+import UserDataProvider from '@/providers/UserDataProvider';
 
 import '@/styles/globals.css';
 

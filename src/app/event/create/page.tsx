@@ -7,7 +7,7 @@ import FormBuilder, { Field } from '@/components/FormBuilder';
 import FormLayout from '@/components/FormLayout';
 import { useRouter } from 'next/navigation';
 import { getErrorMessgaeSuccess } from '@/constants/errors';
-import { useUserData } from '@/components/UserDataProvider';
+import { useUserData } from '@/providers/UserDataProvider';
 import { createEvent } from '@/actions/db';
 
 export default function CreateEventPage() {

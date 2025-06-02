@@ -51,7 +51,11 @@ export default function UserLayout({
               cache: 'force-cache',
             })
               .then((res) => res.json())
+<<<<<<< HEAD
               .then((res) => res.user),
+=======
+              .then((res) => res.user[0]),
+>>>>>>> Adding shit that i changed - im adding a commit message!
             fetch(C.ROUTES.yurbos(userId), {
               cache: 'force-cache',
             })

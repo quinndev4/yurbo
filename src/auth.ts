@@ -52,6 +52,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               id: (
                 await addDoc(collection(firestore, C.COLLECTIONS.USERS), {
                   name: user.name,
+<<<<<<< HEAD
+=======
+                  searchable_name: user.name
+                    ?.toLowerCase()
+                    .replace(/[^a-z0-9]/gi, ''),
+>>>>>>> Adding shit that i changed - im adding a commit message!
                   email: user.email,
                   created_at: serverTimestamp(),
                 })

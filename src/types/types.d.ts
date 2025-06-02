@@ -124,6 +124,7 @@ declare interface CreateLocationError extends GenericError {
 declare interface User {
   id: string;
   name: string;
+  searchable_name: string;
   email: string;
   created_at: Timestamp;
 }

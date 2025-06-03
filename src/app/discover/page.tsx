@@ -7,11 +7,18 @@ import debounce from 'lodash/debounce';
 import { User } from '@/types/types';
 import { Map } from 'immutable';
 import Link from 'next/link';
+import Button from '@/components/Button';
 
 export default function DiscoverPage() {
   const [loading, setLoading] = useState(false);
   const [resultMap, setResultMap] = useState<Map<string, User>>(Map());
-  const [searchMode, setSearchMode] = useState<'profile' | 'yurbo'>('profile');
+  const [searchMode, setSearchMode] = useState<
+    'Profiles' | 'Yurbos' | 'Locations'
+  >('Profiles');
+
+  const tabColor = (_searchMode: string, tab: string) => {
+    return tab === _searchMode ? 'font-bold border border-gray-200' : '';
+  };
 
   const debouncedResults = debounce(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,6 +49,22 @@ export default function DiscoverPage() {
   return (
     <div className='flex flex-col'>
       <h1 className='text-2xl'>Discover</h1>
+      <div className='flex border-b border-gray-200'>
+        {['Profiles', 'Yurbos', 'Locations'].map((tab) => {
+          return (
+            <button
+              className={`rounded px-4 py-1 ${tabColor(searchMode, tab)} text-white`}
+              key={tab}
+              onClick={() => {
+                setSearchMode(tab as 'Profiles' | 'Yurbos' | 'Locations');
+              }}
+            >
+              {tab}
+            </button>
+          );
+        })}
+      </div>
+
       <input
         className=''
         type='text'

@@ -12,7 +12,7 @@ export default function DiscoverPage() {
   const [loading, setLoading] = useState(false);
   const [resultMap, setResultMap] = useState<
     Map<string, User> | Map<string, Yurbo> | Map<string, Location>
-  >(Map());
+  >(Map<string, User>());
   const [searchMode, setSearchMode] = useState<
     'Profiles' | 'Yurbos' | 'Locations'
   >('Profiles');
@@ -71,7 +71,7 @@ export default function DiscoverPage() {
 
         console.log('THE DEBOUNCED RESULT:', resultMap);
       } else {
-        setResultMap(Map());
+        setResultMap(Map<string, User>());
       }
     },
     500

@@ -116,7 +116,7 @@ export default function DiscoverPage() {
           {[...resultMap].map(([, user]) => {
             return (
               <Link key={user.id} href={`/${user.id}/profile/`}>
-                {user.email}
+                {(user as User).email}
               </Link>
             );
           })}

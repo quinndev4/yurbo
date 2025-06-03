@@ -1,7 +1,6 @@
 import { getErrorMessage } from '@/constants/errors';
 import { getUser } from '@/app/actions/getUser';
 
-import { getUsers } from '@/app/actions/getUsers';
 import { NextRequest } from 'next/server';
 
 export async function GET(

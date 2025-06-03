@@ -8,12 +8,12 @@ const COLLECTIONS = {
 };
 
 const ROUTES = {
-  yurbos: (id?: string) =>
-    `/api/${COLLECTIONS.USERS}/${id}/${COLLECTIONS.YURBOS}`,
+  yurbos: (id?: string, query?: string) =>
+    `/api/${COLLECTIONS.USERS}/${id}/${COLLECTIONS.YURBOS}?query=${query}`,
   events: (id?: string) =>
     `/api/${COLLECTIONS.USERS}/${id}/${COLLECTIONS.EVENTS}`,
-  locations: (id?: string) =>
-    `/api/${COLLECTIONS.USERS}/${id}/${COLLECTIONS.LOCATIONS}`,
+  locations: (id?: string, query?: string) =>
+    `/api/${COLLECTIONS.USERS}/${id}/${COLLECTIONS.LOCATIONS}?query=${query}`,
   friends: (id?: string) =>
     `/api/${COLLECTIONS.USERS}/${id}/friends?query=following`,
   followers: (id?: string) =>

@@ -14,7 +14,6 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // Depending on type of get request, tweak
   try {
     console.log('GET query:', query);
     const users = await getUsers(query);

@@ -1,9 +1,16 @@
 import { auth } from '@/auth';
-import { collection, getDocs, query } from 'firebase/firestore';
+import {
+  collection,
+  collectionGroup,
+  getDocs,
+  query,
+  where,
+} from 'firebase/firestore';
 import { firestore } from '@/firebase';
 import { ERRORS, getErrorMessage } from '@/constants/errors';
 import { C } from '@/constants/constants';
 import { NextRequest } from 'next/server';
+import { Location } from '@/types/types';
 
 export async function GET(
   request: NextRequest,
@@ -18,12 +25,37 @@ export async function GET(
 
     const session = await auth();
 
+    // GET params
+    const searchParams = request.nextUrl.searchParams;
+    const getQuery = searchParams.get('query');
+
     // no user found in session
     if (!session?.user?.id) {
       throw new Error(ERRORS.UNATHORIZED);
     }
 
-    // get locations for this user
+    console.log('query:', query);
+
+    // If the user has get params, then search location by name
+    if (query && query.length > 0) {
+      const locations_snapshot = await getDocs(
+        query(
+          collectionGroup(firestore, C.COLLECTIONS.LOCATIONS),
+          where('name', '>=', getQuery),
+          where('name', '<=', getQuery + '\uf8ff')
+        )
+      );
+
+      const locations_list = locations_snapshot.docs.map((doc) => {
+        return { id: doc.id, ...doc.data() } as Location;
+      });
+
+      console.log('LOCATIONS:', locations_list);
+
+      return Response.json({ locations: locations_list });
+    }
+
+    // No get params - search location by user
     const personal_locations = await getDocs(
       query(
         collection(firestore, C.COLLECTIONS.USERS, id, C.COLLECTIONS.LOCATIONS)
@@ -35,7 +67,7 @@ export async function GET(
       ...doc.data(),
     }));
 
-    console.log('ayo', locations);
+    console.log('locations', locations);
 
     return Response.json({ locations });
   } catch (error) {

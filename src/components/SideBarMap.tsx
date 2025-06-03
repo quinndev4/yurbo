@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   Map as MapComponent,
   MapRef,
@@ -6,7 +6,6 @@ import {
   FullscreenControl,
   ScaleControl,
   GeolocateControl,
-  Popup,
   Layer,
   Source,
   LngLatBounds,
@@ -25,9 +24,19 @@ import {
   FireIcon,
 } from '@heroicons/react/24/outline';
 import { Map } from 'immutable';
+import { GeoJSONSource } from 'maplibre-gl';
 
-const MAX_ZOOM_LEVEL = 9;
-const NO_CLUSTER = 13;
+const HEAT_MAX_ZOOM = 14;
+
+const CLUSTER_LAYER_ID = 'clusters';
+const CLUSTER_COUNT_LAYER_ID = 'cluster-count';
+const UNCLUSTERED_POINT_LAYER_ID = 'unclustered-point';
+
+const LAYERS = [
+  CLUSTER_LAYER_ID,
+  CLUSTER_COUNT_LAYER_ID,
+  UNCLUSTERED_POINT_LAYER_ID,
+];
 
 const MapWithSidebar = ({ yurbos }: { yurbos: Map<string, Yurbo> }) => {
   const mapRef = useRef<MapRef>(null);
@@ -43,13 +52,10 @@ const MapWithSidebar = ({ yurbos }: { yurbos: Map<string, Yurbo> }) => {
   const [mapBounds, setMapBounds] = useState<LngLatBounds | undefined>();
   const [centerBounds, setCenterBounds] = useState<LngLatBounds | undefined>();
 
+  const [sideBarYurbos, setSideBarYurbos] =
+    useState<Map<string, Yurbo>>(yurbos);
+
   const cardRefs = useRef<{ [id: string]: HTMLLIElement | null }>({});
-
-  useEffect(() => {
-    const src = mapRef.current?.getSource('yurbos-map-source');
-
-    console.log('srccc', src);
-  }, [mapType]);
 
   const scrollToYurbo = (yurbo: Yurbo) => {
     // Scroll to the corresponding card
@@ -58,16 +64,19 @@ const MapWithSidebar = ({ yurbos }: { yurbos: Map<string, Yurbo> }) => {
       block: 'center',
     });
 
+    const zoom = mapRef.current?.getZoom();
+
     mapRef.current?.flyTo({
       center: [yurbo.long, yurbo.lat],
-      zoom: NO_CLUSTER, // Adjust zoom level as needed
+      zoom: zoom && zoom > HEAT_MAX_ZOOM ? zoom : HEAT_MAX_ZOOM, // Adjust zoom level as needed
       speed: 1.2, // Animation speed
       curve: 1.42, // Animation curve
       easing: (t) => t, // Easing function
       essential: true, // This animation is considered essential
+      duration: 1500,
     });
 
-    setSelectedYurbo(yurbos.get(yurbo.id) ?? null);
+    setSelectedYurbo(yurbo);
   };
 
   const centerMap = () => {
@@ -119,9 +128,13 @@ const MapWithSidebar = ({ yurbos }: { yurbos: Map<string, Yurbo> }) => {
       >
         {/* Sidebar */}
         <div className='h-full w-[300px] overflow-y-auto rounded-lg bg-white shadow-lg'>
+          <h2 className='text-xl text-black'>
+            Total Yurbos: {sideBarYurbos.size}
+          </h2>
+
           {/* Sidebar content */}
           <ul className='space-y-4 p-4'>
-            {[...yurbos].map(([, yurbo]) => (
+            {[...sideBarYurbos].map(([, yurbo]) => (
               <li
                 key={`sidebar-li-${yurbo.id}`}
                 ref={(el) => {
@@ -153,11 +166,15 @@ const MapWithSidebar = ({ yurbos }: { yurbos: Map<string, Yurbo> }) => {
         onLoad={(e) => {
           const map = e.target;
 
-          map.on('mouseenter', 'unclustered-point', () => {
+          map.on('mouseenter', UNCLUSTERED_POINT_LAYER_ID, () => {
             map.getCanvas().style.cursor = 'pointer';
           });
 
-          map.on('click', 'unclustered-point', (clickEvent) => {
+          map.on('mouseenter', CLUSTER_LAYER_ID, () => {
+            map.getCanvas().style.cursor = 'pointer';
+          });
+
+          map.on('click', UNCLUSTERED_POINT_LAYER_ID, (clickEvent) => {
             const clicked = yurbos.get(
               clickEvent.features?.[0]?.properties?.id
             );
@@ -167,7 +184,71 @@ const MapWithSidebar = ({ yurbos }: { yurbos: Map<string, Yurbo> }) => {
             }
           });
 
-          mapRef.current?.on('moveend', (e) => {
+          map.on('click', CLUSTER_LAYER_ID, async (clickEvent) => {
+            const features = map.queryRenderedFeatures(clickEvent.point, {
+              layers: [CLUSTER_LAYER_ID],
+            });
+
+            const clusterId = features[0]?.properties?.cluster_id;
+
+            const pointCount = features[0]?.properties?.point_count;
+
+            const clusterSource =
+              map.getSource<GeoJSONSource>('yurbos-map-source');
+
+            // const clusterChildren =
+            //   await clusterSource?.getClusterChildren(clusterId);
+
+            const clusterLeaves = await clusterSource?.getClusterLeaves(
+              clusterId,
+              pointCount,
+              0
+            );
+
+            if (
+              clusterLeaves &&
+              clusterLeaves[0].geometry.type === 'Point' &&
+              clusterLeaves[0].geometry.coordinates.length === 2
+            ) {
+              setSideBarYurbos(
+                Map(
+                  clusterLeaves?.map((leaf) => [
+                    leaf.properties?.id as string,
+                    leaf.properties?.yurbo as Yurbo,
+                  ])
+                )
+              );
+
+              const clusterZoom =
+                await clusterSource?.getClusterExpansionZoom(clusterId);
+
+              map.flyTo({
+                center: clusterLeaves[0].geometry.coordinates as [
+                  number,
+                  number,
+                ],
+                zoom: clusterZoom, // Adjust zoom level as needed
+                speed: 1.2, // Animation speed
+                curve: 1.42, // Animation curve
+                easing: (t) => t, // Easing function
+                essential: true, // This animation is considered essential
+                duration: 1500,
+              });
+            }
+          });
+
+          map.on('click', (e) => {
+            const features = map.queryRenderedFeatures(e.point, {
+              layers: LAYERS,
+            });
+
+            if (!features.length) {
+              console.log('No features found at this point');
+              setSideBarYurbos(yurbos);
+            }
+          });
+
+          map.on('moveend', (e) => {
             if ('id' in e && e.id === 'center-map') {
               setCenterBounds(mapRef.current?.getBounds());
             }
@@ -177,11 +258,16 @@ const MapWithSidebar = ({ yurbos }: { yurbos: Map<string, Yurbo> }) => {
             }
           });
 
-          map.on('mouseleave', 'unclustered-point', () => {
+          map.on('mouseleave', UNCLUSTERED_POINT_LAYER_ID, () => {
+            map.getCanvas().style.cursor = 'grab';
+          });
+
+          map.on('mouseleave', CLUSTER_LAYER_ID, () => {
             map.getCanvas().style.cursor = 'grab';
           });
 
           centerMap();
+          setSideBarYurbos(yurbos);
         }}
         mapStyle='https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
       >
@@ -249,29 +335,28 @@ const MapWithSidebar = ({ yurbos }: { yurbos: Map<string, Yurbo> }) => {
             type: 'FeatureCollection',
             features: [...yurbos].map(([, yurbo]) => ({
               type: 'Feature',
-              properties: { id: yurbo.id },
+              properties: { id: yurbo.id, yurbo },
               geometry: { type: 'Point', coordinates: [yurbo.long, yurbo.lat] },
             })),
           }}
           {...(mapType === 'cluster' && {
             cluster: true,
-            clusterMaxZoom: NO_CLUSTER,
-            clusterRadius: 50,
+            clusterRadius: 20,
+            clusterMaxZoom: 24,
           })}
         >
           {mapType === 'cluster' && (
             <Layer
-              id='clusters'
+              id={CLUSTER_LAYER_ID}
               type='circle'
               source='yurbos-map-source'
               filter={['has', 'point_count']}
-              maxzoom={NO_CLUSTER}
               paint={{
                 'circle-color': [
                   'step',
                   ['get', 'point_count'],
                   '#d00',
-                  3,
+                  2,
                   '#51bbd6',
                   6,
                   '#f28cb1',
@@ -299,7 +384,7 @@ const MapWithSidebar = ({ yurbos }: { yurbos: Map<string, Yurbo> }) => {
 
           {mapType === 'cluster' && (
             <Layer
-              id='cluster-count'
+              id={CLUSTER_COUNT_LAYER_ID}
               type='symbol'
               source='yurbos-map-source'
               filter={['has', 'point_count']}
@@ -313,7 +398,7 @@ const MapWithSidebar = ({ yurbos }: { yurbos: Map<string, Yurbo> }) => {
           {mapType === 'heat' && (
             <Layer
               id='heatmap'
-              maxzoom={NO_CLUSTER}
+              maxzoom={HEAT_MAX_ZOOM}
               type='heatmap'
               source='yurbos-map-source'
               paint={{
@@ -336,7 +421,7 @@ const MapWithSidebar = ({ yurbos }: { yurbos: Map<string, Yurbo> }) => {
                   ['zoom'],
                   0,
                   1,
-                  MAX_ZOOM_LEVEL,
+                  9,
                   3,
                 ],
                 // Color ramp for heatmap.  Domain is 0 (low) to 1 (high).
@@ -366,7 +451,7 @@ const MapWithSidebar = ({ yurbos }: { yurbos: Map<string, Yurbo> }) => {
                   ['zoom'],
                   0,
                   2,
-                  MAX_ZOOM_LEVEL,
+                  9,
                   20,
                 ],
                 // Transition from heatmap to circle layer by zoom level
@@ -384,7 +469,7 @@ const MapWithSidebar = ({ yurbos }: { yurbos: Map<string, Yurbo> }) => {
           )}
 
           <Layer
-            id='unclustered-point'
+            id={UNCLUSTERED_POINT_LAYER_ID}
             type='circle'
             source='yurbos-map-source'
             paint={{
@@ -395,21 +480,9 @@ const MapWithSidebar = ({ yurbos }: { yurbos: Map<string, Yurbo> }) => {
             }}
             {...(mapType === 'cluster'
               ? { filter: ['!', ['has', 'point_count']] }
-              : { minzoom: NO_CLUSTER })}
+              : { minzoom: HEAT_MAX_ZOOM })}
           />
         </Source>
-
-        {selectedYurbo && (
-          <Popup
-            anchor='top'
-            style={{ fontWeight: 800, color: 'black' }}
-            longitude={selectedYurbo.long}
-            latitude={selectedYurbo.lat}
-            onClose={() => setSelectedYurbo(null)}
-          >
-            {selectedYurbo.name}
-          </Popup>
-        )}
       </MapComponent>
     </div>
   );

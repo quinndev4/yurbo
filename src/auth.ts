@@ -11,8 +11,6 @@ import NextAuth from 'next-auth';
 import Google from 'next-auth/providers/google';
 import { firestore } from './firebase';
 import { C } from './constants/constants';
-import { FirestoreAdapter } from '@auth/firebase-adapter';
-import { cert } from 'firebase-admin/app';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
@@ -52,12 +50,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               id: (
                 await addDoc(collection(firestore, C.COLLECTIONS.USERS), {
                   name: user.name,
-<<<<<<< HEAD
-=======
                   searchable_name: user.name
                     ?.toLowerCase()
                     .replace(/[^a-z0-9]/gi, ''),
->>>>>>> Adding shit that i changed - im adding a commit message!
                   email: user.email,
                   created_at: serverTimestamp(),
                 })

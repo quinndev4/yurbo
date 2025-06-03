@@ -17,10 +17,7 @@
     "firebase-admin": "^12.7.0",
     "geolib": "^3.3.4",
     "immutable": "^5.1.2",
-<<<<<<< HEAD
-=======
     "lodash": "^4.17.21",
->>>>>>> Adding shit that i changed - im adding a commit message!
     "maplibre-gl": "^5.5.0",
     "next": "^15.3.2",
     "next-auth": "^5.0.0-beta.28",

@@ -5,11 +5,7 @@ import { firestore } from '@/firebase';
 import { User } from '@/types/types';
 import { C } from '@/constants/constants';
 
-<<<<<<< HEAD
 export async function getUser(id: string): Promise<User> {
-=======
-export async function getUser(id: string): Promise<User[]> {
->>>>>>> Adding shit that i changed - im adding a commit message!
   try {
     const session = await auth();
 
@@ -18,17 +14,10 @@ export async function getUser(id: string): Promise<User[]> {
       throw new Error(ERRORS.UNATHORIZED);
     }
 
-<<<<<<< HEAD
-    // get all records where user is the follower
-    const userDoc = await getDoc(doc(firestore, C.COLLECTIONS.USERS, id));
-
-    return { id: userDoc.id, ...userDoc.data() } as User;
-=======
     // If you are searching via ID only
     const userDoc = await getDoc(doc(firestore, C.COLLECTIONS.USERS, id));
 
-    return [{ id: userDoc.id, ...userDoc.data() } as User];
->>>>>>> Adding shit that i changed - im adding a commit message!
+    return { id: userDoc.id, ...userDoc.data() } as User;
   } catch (error) {
     const errorMessage = getErrorMessage(error);
 

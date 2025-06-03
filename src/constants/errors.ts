@@ -23,6 +23,9 @@ export const ERRORS = {
     GETPARAMS: 'Invalid GET params',
     YOURSELF: 'You cannot follow yourself',
   },
+  USERS: {
+    EMPTY_QUERY: 'Empty query not allowed',
+  },
   UNATHORIZED: 'User not authorized',
   UNKNOWN: 'An unknown error occurred',
 };

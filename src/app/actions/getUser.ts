@@ -14,7 +14,7 @@ export async function getUser(id: string): Promise<User> {
       throw new Error(ERRORS.UNATHORIZED);
     }
 
-    // get all records where user is the follower
+    // If you are searching via ID only
     const userDoc = await getDoc(doc(firestore, C.COLLECTIONS.USERS, id));
 
     return { id: userDoc.id, ...userDoc.data() } as User;

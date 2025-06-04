@@ -1,5 +1,6 @@
 import { getErrorMessage } from '@/constants/errors';
 import { getUser } from '@/app/actions/getUser';
+
 import { NextRequest } from 'next/server';
 
 export async function GET(
@@ -23,7 +24,7 @@ export async function GET(
     const errorMessage = getErrorMessage(error);
 
     return Response.json(
-      { mesage: errorMessage, success: false },
+      { mesage: errorMessage, success: false, yeet: 'YEET' },
       { status: 500 }
     );
   }

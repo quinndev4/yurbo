@@ -1,26 +1,30 @@
-import Link from 'next/link';
-import React from 'react';
-import SignOutButton from './SignOutButton';
+'use client';
 
-export default async function NavBar() {
+import React, { useState } from 'react';
+import Link from 'next/link';
+
+const buttons = [
+  { href: '/me', label: 'Me' },
+  { href: '/friends', label: 'Friends' },
+  { href: '/yurbos', label: 'Yurbo' },
+  { href: '/', label: 'Something' },
+  { href: '/settings', label: 'Settings' },
+];
+
+export default function NavBar() {
+  const [activeTab, setactiveTab] = useState(buttons[2].label);
   return (
     <header className='fixed top-0 z-50 flex h-20 w-full items-center justify-between border-b-2 bg-black'>
-      {/* Home logo */}
-      <Link className='mx-4 text-3xl font-bold hover:cursor-pointer' href='/'>
-        Yurbo
-      </Link>
-      <div className='flex items-center'>
+      {buttons.map((button) => (
         <Link
-          className='rounded-lg border-2 border-transparent p-2 text-xl font-bold hover:cursor-pointer hover:border-white'
-          href='/me/profile'
+          key={`nav-bar-link-${button.href}`}
+          href={button.href}
+          onClick={() => setactiveTab(button.label)}
+          className={`p-2 px-8 text-center transition-transform duration-200 hover:scale-110 ${activeTab === button.label ? 'scale-110' : ''}`}
         >
-          Profile
+          {button.label}
         </Link>
-
-        <div className='mx-4'>
-          <SignOutButton />
-        </div>
-      </div>
+      ))}
     </header>
   );
 }

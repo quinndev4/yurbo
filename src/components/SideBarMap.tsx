@@ -17,9 +17,6 @@ import { CustomControl, CustomControlGroup } from './CustomControl';
 
 import {
   ArrowUpCircleIcon,
-  UserCircleIcon,
-  UserPlusIcon,
-  GlobeAltIcon,
   MapPinIcon,
   FireIcon,
 } from '@heroicons/react/24/outline';
@@ -41,10 +38,7 @@ const LAYERS = [
 const MapWithSidebar = ({ yurbos }: { yurbos: Map<string, Yurbo> }) => {
   const mapRef = useRef<MapRef>(null);
 
-  const [mapType, setMapType] = useState<'heat' | 'cluster'>('heat');
-  const [yurboSource, setYurboSource] = useState<'me' | 'following' | 'all'>(
-    'me'
-  );
+  const [mapType, setMapType] = useState<'heat' | 'cluster'>('cluster');
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedYurbo, setSelectedYurbo] = useState<Yurbo | null>(null);
@@ -288,41 +282,19 @@ const MapWithSidebar = ({ yurbos }: { yurbos: Map<string, Yurbo> }) => {
           />
         </CustomControlGroup>
 
-        {/* Yurbo filtering controls */}
-        <CustomControlGroup position='top-right'>
-          <CustomControl
-            title='My Yurbos'
-            onClick={() => setYurboSource('me')}
-            icon={UserCircleIcon}
-            selected={yurboSource === 'me'}
-          />
-          <CustomControl
-            title='Following Yurbos'
-            onClick={() => setYurboSource('following')}
-            icon={UserPlusIcon}
-            selected={yurboSource === 'following'}
-          />
-          <CustomControl
-            title='All Yurbos'
-            onClick={() => setYurboSource('all')}
-            icon={GlobeAltIcon}
-            selected={yurboSource === 'all'}
-          />
-        </CustomControlGroup>
-
         {/* Map type controls */}
         <CustomControlGroup position='top-right'>
-          <CustomControl
-            title='Heat map'
-            onClick={() => setMapType('heat')}
-            icon={FireIcon}
-            selected={mapType === 'heat'}
-          />
           <CustomControl
             title='Clustered map'
             onClick={() => setMapType('cluster')}
             icon={MapPinIcon}
             selected={mapType === 'cluster'}
+          />
+          <CustomControl
+            title='Heat map'
+            onClick={() => setMapType('heat')}
+            icon={FireIcon}
+            selected={mapType === 'heat'}
           />
         </CustomControlGroup>
 

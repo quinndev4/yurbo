@@ -60,14 +60,25 @@ export const createLocation = authActionClient
           userId,
           C.COLLECTIONS.LOCATIONS
         ),
-        { ...body, created_at: serverTimestamp() }
+        {
+          ...body,
+          searchable_name: body.name.toLowerCase().replace(/[^a-z0-9]/gi, ''), // NEW - now locations have searchability
+          created_at: serverTimestamp(),
+        }
       );
 
       revalidatePath(C.ROUTES.locations(userId));
 
       console.log(LOGS.LOCATION.CREATED, name, id);
 
-      return { location: { id, ...body, created_at: Timestamp.now() } };
+      return {
+        location: {
+          id,
+          ...body,
+          searchable_name: body.name.toLowerCase().replace(/[^a-z0-9]/gi, ''),
+          created_at: Timestamp.now(),
+        },
+      };
     }
   );
 
@@ -78,14 +89,29 @@ export const createYurbo = authActionClient
 
     const { id } = await addDoc(
       collection(firestore, C.COLLECTIONS.USERS, userId, C.COLLECTIONS.YURBOS),
-      { ...parsedInput, created_at: serverTimestamp() }
+      {
+        ...parsedInput,
+        searchable_name: parsedInput.name
+          .toLowerCase()
+          .replace(/[^a-z0-9]/gi, ''),
+        created_at: serverTimestamp(),
+      }
     );
 
     revalidatePath(`/api/users/${userId}/yurbos`);
 
     console.log(LOGS.YURBO.CREATED, parsedInput.name, id);
 
-    return { yurbo: { id, ...parsedInput, created_at: Timestamp.now() } };
+    return {
+      yurbo: {
+        id,
+        ...parsedInput,
+        searchable_name: parsedInput.name
+          .toLowerCase()
+          .replace(/[^a-z0-9]/gi, ''),
+        created_at: Timestamp.now(),
+      },
+    };
   });
 
 export const createFriend = authActionClient

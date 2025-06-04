@@ -34,15 +34,15 @@ export async function GET(
       throw new Error(ERRORS.UNATHORIZED);
     }
 
-    console.log('query:', query);
+    console.log('query:', getQuery);
 
     // If the user has get params, then search location by name
-    if (query && query.length > 0) {
+    if (getQuery && getQuery.length > 0) {
       const locations_snapshot = await getDocs(
         query(
           collectionGroup(firestore, C.COLLECTIONS.LOCATIONS),
-          where('name', '>=', getQuery),
-          where('name', '<=', getQuery + '\uf8ff')
+          where('searchable_name', '>=', getQuery),
+          where('searchable_name', '<=', getQuery + '\uf8ff')
         )
       );
 

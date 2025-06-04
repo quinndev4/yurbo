@@ -46,9 +46,14 @@ export default function DiscoverPage() {
 
   const getYurbos = async (query: string) => {
     // TBD -- placeholder to get users rn
-    const ret = await (await fetch(C.ROUTES.users(query))).json();
-    const users: User[] = ret.users;
-    const resultMap = Map(users.map((user) => [user.id, user]));
+    console.log('running getYurbos on ', query);
+    const ret = (
+      await (await fetch(C.ROUTES.yurbos(session?.user?.id, query))).json()
+    ).searchableYurbos;
+
+    const resultMap: Map<string, Yurbo> = Map<string, Yurbo>(
+      ret.map((yurbo: Yurbo) => [yurbo.id, yurbo])
+    );
     setResultMap(resultMap);
     setLoading(false);
     return resultMap;
@@ -111,7 +116,7 @@ export default function DiscoverPage() {
 
       {loading ? (
         'loading...'
-      ) : ['Profiles', 'Yurbos'].includes(searchMode) ? (
+      ) : searchMode === 'Profiles' ? (
         <ul className='flex flex-col'>
           {[...resultMap].map(([, user]) => {
             return (
@@ -125,6 +130,19 @@ export default function DiscoverPage() {
         <ul className='flex flex-col'>
           {[...resultMap].map(([, location]) => {
             return <li key={location.id}>{location.name}</li>;
+          })}
+        </ul>
+      ) : searchMode === 'Yurbos' ? (
+        <ul className='flex flex-col'>
+          {[...resultMap].map(([, yurbo]) => {
+            return (
+              <li className='' key={yurbo.id}>
+                {yurbo.name}{' '}
+                <p className='text-[0.625rem]'>
+                  {(yurbo as Yurbo).description}
+                </p>
+              </li>
+            );
           })}
         </ul>
       ) : null}
